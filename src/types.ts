@@ -16,6 +16,20 @@ export interface SutraConfig {
 }
 
 // ---------------------------------------------------------------------------
+// Tier
+// ---------------------------------------------------------------------------
+
+export type ToolTier = 'free' | 'pro';
+
+export interface TierResponse {
+  tier: ToolTier;
+  tools: string[];
+  limits: { requests_per_day: number };
+  key_prefix?: string;
+  warning?: string;
+}
+
+// ---------------------------------------------------------------------------
 // Constraints
 // ---------------------------------------------------------------------------
 
@@ -47,6 +61,49 @@ export interface DocSearchResult {
   chunk_type: string;
   similarity: number;
   page_number?: number;
+}
+
+// ---------------------------------------------------------------------------
+// Rules (Pro)
+// ---------------------------------------------------------------------------
+
+export interface Rule {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  severity: string;
+  context: string;
+  code_example?: string;
+  confidence?: number;
+}
+
+// ---------------------------------------------------------------------------
+// Patterns (Pro)
+// ---------------------------------------------------------------------------
+
+export interface Pattern {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  context: string;
+  code_example?: string;
+  similarity?: number;
+}
+
+// ---------------------------------------------------------------------------
+// Decision Guides (Pro)
+// ---------------------------------------------------------------------------
+
+export interface DecisionGuide {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  context: string;
+  recommendation?: string;
+  similarity?: number;
 }
 
 // ---------------------------------------------------------------------------
@@ -94,4 +151,21 @@ export interface DocSearchResponse extends ApiResponse<DocSearchResult[]> {
 export interface ReleasesResponse extends ApiResponse<Release[]> {
   releases: Release[];
   count: number;
+}
+
+export interface RulesResponse extends ApiResponse<Rule[]> {
+  rules: Rule[];
+  count: number;
+}
+
+export interface PatternsResponse extends ApiResponse<Pattern[]> {
+  patterns: Pattern[];
+  count: number;
+  query: string;
+}
+
+export interface DecisionGuidesResponse extends ApiResponse<DecisionGuide[]> {
+  guides: DecisionGuide[];
+  count: number;
+  query: string;
 }
