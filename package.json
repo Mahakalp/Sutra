@@ -1,0 +1,55 @@
+{
+  "name": "@mahakalp/salesforce-mcp",
+  "version": "0.1.0",
+  "description": "Open-source MCP server that makes any AI assistant a Salesforce expert",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "mahakalp-sf-mcp": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx src/index.ts",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "salesforce",
+    "mcp",
+    "ai",
+    "llm",
+    "governor-limits",
+    "apex",
+    "model-context-protocol",
+    "claude",
+    "cursor",
+    "copilot"
+  ],
+  "author": "Mahakalp <hello@mahakalp.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mahakalp/Sutra.git"
+  },
+  "homepage": "https://mahakalp.dev",
+  "bugs": {
+    "url": "https://github.com/Mahakalp/Sutra/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.21",
+    "typescript": "^5.8.3",
+    "tsx": "^4.19.4"
+  }
+}
