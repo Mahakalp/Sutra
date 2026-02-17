@@ -105,59 +105,25 @@ Once configured, your AI assistant can answer questions like:
 - "Search the Salesforce docs for bulk API best practices"
 - "What API version does the Spring '26 release use?"
 
-## Pro tools
-
-[Sutra Pro](https://mahakalp.dev) ($9/mo) unlocks additional tools with an API key:
-
-| Tool | Description |
-|------|-------------|
-| `mahakalp_sf_rules` | Best practice rules and coding standards with severity, category, and code examples. Validate code against platform best practices. |
-| `mahakalp_sf_patterns` | Reusable code patterns and implementation templates. Trigger patterns, batch patterns, integration patterns with examples. |
-| `mahakalp_sf_decision_guides` | Architectural decision guides — when to use X vs Y, trade-off analysis, and implementation recommendations. |
-
-To use Pro tools, set your API key:
-
-```bash
-export MAHAKALP_API_KEY=mk_live_your_key_here
-```
-
-Or in your MCP configuration:
-
-```json
-{
-  "mcpServers": {
-    "salesforce-mcp": {
-      "command": "npx",
-      "args": ["@mahakalp/salesforce-mcp"],
-      "env": {
-        "MAHAKALP_API_KEY": "mk_live_your_key_here"
-      }
-    }
-  }
-}
-```
-
-Get an API key at [mahakalp.dev](https://mahakalp.dev).
-
 ## Roadmap
 
-Planned Pro tools (not yet available):
+Coming soon with Sutra Pro:
 
 | Tool | Description |
 |------|-------------|
+| Best Practice Rules | Coding standards with severity, category, and code examples |
+| Code Patterns | Reusable implementation templates — trigger, batch, integration patterns |
+| Decision Guides | Architectural decision guides — when to use X vs Y, trade-off analysis |
 | Apex Class Library | Full method signatures, parameters, return types, and governor limit implications |
 | Standard Object Schema | Standard fields, relationships, and FLS patterns |
 | LWC Component Reference | Attributes, events, wire adapters, and Apex integration patterns |
 | Tribal Knowledge | Community-sourced patterns, anti-patterns, and hard-won lessons |
-| SOQL Optimizer | Query selectivity analysis, governor limit risk, and indexing recommendations |
-| Code Pattern Analyzer | Governor limit risk detection and bulkification suggestions |
-| Trigger Context Advisor | Context variables, execution order, and common pitfalls |
+
 
 ## Configuration
 
 | Environment variable | Description | Default |
 |---------------------|-------------|---------|
-| `MAHAKALP_API_KEY` | API key for paid tools (optional for free tools) | — |
 | `MAHAKALP_API_URL` | API endpoint override (for development) | `https://yantra.mahakalp.dev` |
 
 ## How it works
