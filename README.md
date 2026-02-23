@@ -119,13 +119,6 @@ Coming soon with Sutra Pro:
 | LWC Component Reference | Attributes, events, wire adapters, and Apex integration patterns |
 | Tribal Knowledge | Community-sourced patterns, anti-patterns, and hard-won lessons |
 
-Follow [Nishant](https://linkedin.com/in/goswami-nishant) or [Mahakalp](https://linkedin.com/company/mahakalp) for updates.
-
-## Configuration
-
-| Environment variable | Description | Default |
-|---------------------|-------------|---------|
-| `MAHAKALP_API_URL` | API endpoint override (for development) | `https://yantra.mahakalp.dev` |
 
 ## How it works
 
