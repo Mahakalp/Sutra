@@ -125,6 +125,8 @@ export interface Release {
 // API Responses
 // ---------------------------------------------------------------------------
 
+// The generic T is used by extending interfaces for type safety
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export interface ApiResponse<T> {
   success: boolean;
   error?: string;

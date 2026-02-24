@@ -1,5 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import type { YantraClient } from './client.js';
+import { describe, it, expect, vi } from 'vitest';
 import { getToolDefinitions } from './tools.js';
 
 vi.mock('./client.js', () => ({

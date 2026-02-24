@@ -199,7 +199,7 @@ export class YantraClient {
       return (await response.json()) as T;
     } catch (error) {
       if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error(`Yantra API request timed out after ${this.timeout}ms`);
+        throw new Error(`Yantra API request timed out after ${this.timeout}ms`, { cause: error });
       }
       throw error;
     } finally {
