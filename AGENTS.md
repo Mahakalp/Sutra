@@ -64,27 +64,33 @@ Sutra is an open-source MCP (Model Context Protocol) server that provides Salesf
 - **Language:** TypeScript (Node.js)
 - **Target:** ES2022
 - **Module:** Node16 with Node16 resolution
-- **Package Manager:** npm
-- **Testing:** Vitest (if added)
+- **Package Manager:** bun
+- **Testing:** Vitest
 - **Framework:** @modelcontextprotocol/sdk
 
 ## Build & Development Commands
 
 ```bash
+# Install dependencies
+bun install
+
 # Build the TypeScript project
-npm run build
+bun run build
 
 # Run in development mode (hot reload)
-npm run dev
+bun run dev
 
 # Run the built application
-npm run start
+bun run start
 
 # Type check without emitting
-npm run typecheck
+bun run typecheck
 
 # Clean the dist folder
-npm run clean
+bun run clean
+
+# Run tests
+bun test
 ```
 
 ## Code Style Guidelines

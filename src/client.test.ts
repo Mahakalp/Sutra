@@ -1,15 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { YantraClient } from './client.js';
 
-vi.stubGlobal('fetch', vi.fn());
+const mockFetch = vi.fn();
+globalThis.fetch = mockFetch;
 
 describe('YantraClient', () => {
   let client: YantraClient;
-  let mockFetch: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    mockFetch = vi.fn();
-    vi.stubGlobal('fetch', mockFetch);
+    mockFetch.mockClear();
     client = new YantraClient({ apiBaseUrl: 'https://test.mahakalp.dev', apiKey: 'test-key' });
   });
 
@@ -97,39 +96,28 @@ describe('YantraClient', () => {
   describe('request timeout', () => {
     it('throws timeout error when request exceeds timeout', async () => {
       const slowClient = new YantraClient({ timeout: 10 });
-      const originalFetch = globalThis.fetch;
       const abortError = new Error('The operation was aborted.');
       abortError.name = 'AbortError';
-      globalThis.fetch = vi.fn().mockImplementation(() => new Promise((_, reject) => setTimeout(() => reject(abortError), 20)));
-      
-      try {
-        await expect(slowClient.searchDocs({ query: 'test' })).rejects.toThrow('timed out');
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
+      mockFetch.mockImplementation(() => new Promise((_, reject) => setTimeout(() => reject(abortError), 20)));
+
+      await expect(slowClient.searchDocs({ query: 'test' })).rejects.toThrow('timed out');
     });
   });
 
   describe('API error handling', () => {
     it('throws error with status code on non-ok response when not using fallback', async () => {
       const customClient = new YantraClient({ apiBaseUrl: 'https://test.mahakalp.dev' });
-      const originalFetch = globalThis.fetch;
-      globalThis.fetch = vi.fn().mockResolvedValue({ ok: false, status: 401, statusText: 'Unauthorized', text: () => Promise.resolve('') });
-      
-      try {
-        await expect(customClient.searchDocs({ query: 'test' })).rejects.toThrow('Yantra API error 401');
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
+      mockFetch.mockResolvedValue({ ok: false, status: 401, statusText: 'Unauthorized', text: () => Promise.resolve('') });
+
+      await expect(customClient.searchDocs({ query: 'test' })).rejects.toThrow('Yantra API error 401');
     });
   });
 
   describe('retry logic', () => {
     it('retries on transient errors', async () => {
-      const client = new YantraClient({ apiBaseUrl: 'https://test.mahakalp.dev', maxRetries: 3, retryDelay: 10 });
-      const originalFetch = globalThis.fetch;
+      const retryClient = new YantraClient({ apiBaseUrl: 'https://test.mahakalp.dev', maxRetries: 3, retryDelay: 10 });
       let callCount = 0;
-      globalThis.fetch = vi.fn().mockImplementation(() => {
+      mockFetch.mockImplementation(() => {
         callCount++;
         if (callCount < 3) {
           return Promise.reject(new Error('ECONNRESET'));
@@ -137,51 +125,32 @@ describe('YantraClient', () => {
         return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, results: [], count: 0, query: 'test' }) });
       });
 
-      try {
-        const result = await client.searchDocs({ query: 'test' });
-        expect(callCount).toBe(3);
-        expect(result.success).toBe(true);
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
+      const result = await retryClient.searchDocs({ query: 'test' });
+      expect(callCount).toBe(3);
+      expect(result.success).toBe(true);
     });
 
     it('does not retry on max retries exceeded', async () => {
-      const client = new YantraClient({ apiBaseUrl: 'https://test.mahakalp.dev', maxRetries: 2, retryDelay: 10 });
-      const originalFetch = globalThis.fetch;
-      globalThis.fetch = vi.fn().mockRejectedValue(new Error('ECONNRESET'));
+      const retryClient = new YantraClient({ apiBaseUrl: 'https://test.mahakalp.dev', maxRetries: 2, retryDelay: 10 });
+      mockFetch.mockRejectedValue(new Error('ECONNRESET'));
 
-      try {
-        await expect(client.searchDocs({ query: 'test' })).rejects.toThrow('ECONNRESET');
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
+      await expect(retryClient.searchDocs({ query: 'test' })).rejects.toThrow('ECONNRESET');
     });
   });
 
   describe('healthCheck', () => {
     it('returns true when API is reachable', async () => {
-      const originalFetch = globalThis.fetch;
-      globalThis.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ status: 'ok' }) });
+      mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve({ status: 'ok' }) });
 
-      try {
-        const result = await client.healthCheck();
-        expect(result).toBe(true);
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
+      const result = await client.healthCheck();
+      expect(result).toBe(true);
     });
 
     it('returns false when API is unreachable', async () => {
-      const originalFetch = globalThis.fetch;
-      globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
+      mockFetch.mockRejectedValue(new Error('Network error'));
 
-      try {
-        const result = await client.healthCheck();
-        expect(result).toBe(false);
-      } finally {
-        globalThis.fetch = originalFetch;
-      }
+      const result = await client.healthCheck();
+      expect(result).toBe(false);
     });
   });
 });
