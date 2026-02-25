@@ -13,6 +13,10 @@ export interface SutraConfig {
   apiKey?: string;
   /** Request timeout in ms (default: 10000) */
   timeout?: number;
+  /** Maximum retry attempts for transient failures (default: 3) */
+  maxRetries?: number;
+  /** Delay between retries in ms (default: 1000) */
+  retryDelay?: number;
 }
 
 // ---------------------------------------------------------------------------

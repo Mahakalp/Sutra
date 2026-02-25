@@ -22,6 +22,12 @@ import type { SutraConfig } from './types.js';
 export async function startServer(config: Partial<SutraConfig> = {}): Promise<void> {
   const client = new YantraClient(config);
 
+  // Startup health check
+  const isHealthy = await client.healthCheck();
+  if (!isHealthy) {
+    log('Warning: Could not reach Yantra API. Server starting with limited functionality.');
+  }
+
   // Determine tier and available tools at startup
   const tierInfo = await client.getTier();
   const toolDefs = getToolDefinitions(tierInfo.tools);

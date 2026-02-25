@@ -18,17 +18,23 @@ import type {
 
 const DEFAULT_API_URL = 'https://yantra.mahakalp.dev';
 const DEFAULT_TIMEOUT = 10_000;
+const DEFAULT_MAX_RETRIES = 3;
+const DEFAULT_RETRY_DELAY = 1_000;
 const USER_AGENT = '@mahakalp/salesforce-mcp';
 
 export class YantraClient {
   private readonly baseUrl: string;
   private readonly apiKey?: string;
   private readonly timeout: number;
+  private readonly maxRetries: number;
+  private readonly retryDelay: number;
 
   constructor(config: Partial<SutraConfig> = {}) {
     this.baseUrl = (config.apiBaseUrl ?? DEFAULT_API_URL).replace(/\/+$/, '');
     this.apiKey = config.apiKey;
     this.timeout = config.timeout ?? DEFAULT_TIMEOUT;
+    this.maxRetries = config.maxRetries ?? DEFAULT_MAX_RETRIES;
+    this.retryDelay = config.retryDelay ?? DEFAULT_RETRY_DELAY;
   }
 
   // -------------------------------------------------------------------------
@@ -54,6 +60,19 @@ export class YantraClient {
       return await this.get<TierResponse>('/api/auth/tier');
     } catch {
       return FREE_FALLBACK;
+    }
+  }
+
+  /**
+   * Health check - verifies API connectivity.
+   * Returns true if API is reachable, false otherwise.
+   */
+  async healthCheck(): Promise<boolean> {
+    try {
+      await this.get<{ status: string }>('/api/health');
+      return true;
+    } catch {
+      return false;
     }
   }
 
@@ -169,7 +188,7 @@ export class YantraClient {
     });
   }
 
-  private async request<T>(path: string, init: RequestInit): Promise<T> {
+  private async request<T>(path: string, init: RequestInit, attempt = 0): Promise<T> {
     const url = `${this.baseUrl}${path}`;
 
     const headers: Record<string, string> = {
@@ -201,9 +220,28 @@ export class YantraClient {
       if (error instanceof Error && error.name === 'AbortError') {
         throw new Error(`Yantra API request timed out after ${this.timeout}ms`, { cause: error });
       }
+
+      const isRetryable = this.isRetryableError(error);
+      if (isRetryable && attempt < this.maxRetries) {
+        await this.delay(this.retryDelay * (attempt + 1));
+        return this.request<T>(path, init, attempt + 1);
+      }
+
       throw error;
     } finally {
       clearTimeout(timeoutId);
     }
+  }
+
+  private isRetryableError(error: unknown): boolean {
+    if (error instanceof Error) {
+      const retryableMessages = ['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'ENOTFOUND', 'ENETUNREACH'];
+      return retryableMessages.some((msg) => error.message.includes(msg)) || error.name === 'AbortError';
+    }
+    return false;
+  }
+
+  private delay(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }

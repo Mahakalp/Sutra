@@ -123,4 +123,65 @@ describe('YantraClient', () => {
       }
     });
   });
+
+  describe('retry logic', () => {
+    it('retries on transient errors', async () => {
+      const client = new YantraClient({ apiBaseUrl: 'https://test.mahakalp.dev', maxRetries: 3, retryDelay: 10 });
+      const originalFetch = globalThis.fetch;
+      let callCount = 0;
+      globalThis.fetch = vi.fn().mockImplementation(() => {
+        callCount++;
+        if (callCount < 3) {
+          return Promise.reject(new Error('ECONNRESET'));
+        }
+        return Promise.resolve({ ok: true, json: () => Promise.resolve({ success: true, results: [], count: 0, query: 'test' }) });
+      });
+
+      try {
+        const result = await client.searchDocs({ query: 'test' });
+        expect(callCount).toBe(3);
+        expect(result.success).toBe(true);
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('does not retry on max retries exceeded', async () => {
+      const client = new YantraClient({ apiBaseUrl: 'https://test.mahakalp.dev', maxRetries: 2, retryDelay: 10 });
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = vi.fn().mockRejectedValue(new Error('ECONNRESET'));
+
+      try {
+        await expect(client.searchDocs({ query: 'test' })).rejects.toThrow('ECONNRESET');
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+  });
+
+  describe('healthCheck', () => {
+    it('returns true when API is reachable', async () => {
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = vi.fn().mockResolvedValue({ ok: true, json: () => Promise.resolve({ status: 'ok' }) });
+
+      try {
+        const result = await client.healthCheck();
+        expect(result).toBe(true);
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+
+    it('returns false when API is unreachable', async () => {
+      const originalFetch = globalThis.fetch;
+      globalThis.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
+
+      try {
+        const result = await client.healthCheck();
+        expect(result).toBe(false);
+      } finally {
+        globalThis.fetch = originalFetch;
+      }
+    });
+  });
 });
