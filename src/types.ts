@@ -23,14 +23,60 @@ export interface SutraConfig {
 // Tier
 // ---------------------------------------------------------------------------
 
-export type ToolTier = 'free' | 'pro';
+export type ToolTier = 'free' | 'pro' | 'enterprise';
 
+/**
+ * Entitlement status states per entitlement-sync contract v2026.02.01
+ * - active: Subscription is current and in good standing
+ * - trialing: User is in trial period
+ * - past_due: Payment failed, subscription paused
+ * - canceled: Subscription canceled, access until period end (grace period)
+ * - deleted: Subscription fully terminated
+ */
+export type EntitlementStatus = 'active' | 'trialing' | 'past_due' | 'canceled' | 'deleted';
+
+/**
+ * Feature flags from entitlement claims
+ */
+export interface EntitlementFeatures {
+  advanced_analytics?: boolean;
+  team_collaboration?: boolean;
+  api_access?: boolean;
+  [key: string]: boolean | undefined;
+}
+
+/**
+ * Full entitlement object from Yantra API (derived from Firebase claims)
+ */
+export interface Entitlement {
+  /** Subscription ID */
+  sub_id: string;
+  /** Organization ID */
+  org_id: string;
+  /** Plan tier */
+  tier: ToolTier;
+  /** Licensed seat count */
+  seats: number;
+  /** Unix timestamp of subscription period end */
+  expires_at: number;
+  /** Current entitlement status */
+  status: EntitlementStatus;
+  /** Feature flags from claims */
+  features: EntitlementFeatures;
+}
+
+/**
+ * Response from /api/auth/tier endpoint
+ * Returns available tools based on entitlement
+ */
 export interface TierResponse {
   tier: ToolTier;
   tools: string[];
   limits: { requests_per_day: number };
   key_prefix?: string;
   warning?: string;
+  /** Full entitlement object (when requesting full details) */
+  entitlement?: Entitlement;
 }
 
 // ---------------------------------------------------------------------------

@@ -14,6 +14,8 @@ import type {
   RulesResponse,
   PatternsResponse,
   DecisionGuidesResponse,
+  Entitlement,
+  EntitlementStatus,
 } from './types.js';
 
 const DEFAULT_API_URL = 'https://yantra.mahakalp.dev';
@@ -48,11 +50,7 @@ export class YantraClient {
   async getTier(): Promise<TierResponse> {
     const FREE_FALLBACK: TierResponse = {
       tier: 'free',
-      tools: [
-        'mahakalp_sf_constraints',
-        'mahakalp_sf_doc_search',
-        'mahakalp_sf_releases',
-      ],
+      tools: ['mahakalp_sf_constraints', 'mahakalp_sf_doc_search', 'mahakalp_sf_releases'],
       limits: { requests_per_day: 100 },
     };
 
@@ -61,6 +59,79 @@ export class YantraClient {
     } catch {
       return FREE_FALLBACK;
     }
+  }
+
+  /**
+   * Fetch full entitlement details from Yantra API.
+   * This provides the canonical entitlement state derived from Firebase claims.
+   * Returns null entitlement on error (graceful degradation to free tier).
+   */
+  async getEntitlement(): Promise<Entitlement | null> {
+    try {
+      const response = await this.get<{ entitlement: Entitlement }>('/api/auth/entitlement');
+      return response.entitlement ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Check if entitlement is in a valid state for Pro tier access.
+   * Valid states: 'active' | 'trialing'
+   * Grace period states (still allow access): 'canceled' (until period end)
+   * Invalid states: 'past_due' | 'deleted'
+   */
+  isEntitlementValid(entitlement: Entitlement | null): boolean {
+    if (!entitlement) return false;
+
+    const validStates: EntitlementStatus[] = ['active', 'trialing'];
+    const graceStates: EntitlementStatus[] = ['canceled'];
+
+    if (validStates.includes(entitlement.status)) {
+      return true;
+    }
+
+    if (graceStates.includes(entitlement.status)) {
+      return entitlement.expires_at > Math.floor(Date.now() / 1000);
+    }
+
+    return false;
+  }
+
+  /**
+   * Get tool access level based on entitlement.
+   * Returns array of allowed tool names.
+   */
+  getAllowedTools(entitlement: Entitlement | null): string[] {
+    const FREE_TOOLS = [
+      'mahakalp_sf_constraints',
+      'mahakalp_sf_doc_search',
+      'mahakalp_sf_releases',
+    ];
+
+    const PRO_TOOLS = [
+      'mahakalp_sf_constraints',
+      'mahakalp_sf_doc_search',
+      'mahakalp_sf_releases',
+      'mahakalp_sf_rules',
+      'mahakalp_sf_patterns',
+      'mahakalp_sf_decision_guides',
+    ];
+
+    if (!entitlement) {
+      return FREE_TOOLS;
+    }
+
+    const tier = entitlement.tier;
+    if (tier === 'free') {
+      return FREE_TOOLS;
+    }
+
+    if (this.isEntitlementValid(entitlement)) {
+      return PRO_TOOLS;
+    }
+
+    return FREE_TOOLS;
   }
 
   /**
@@ -235,8 +306,16 @@ export class YantraClient {
 
   private isRetryableError(error: unknown): boolean {
     if (error instanceof Error) {
-      const retryableMessages = ['ECONNRESET', 'ECONNREFUSED', 'ETIMEDOUT', 'ENOTFOUND', 'ENETUNREACH'];
-      return retryableMessages.some((msg) => error.message.includes(msg)) || error.name === 'AbortError';
+      const retryableMessages = [
+        'ECONNRESET',
+        'ECONNREFUSED',
+        'ETIMEDOUT',
+        'ENOTFOUND',
+        'ENETUNREACH',
+      ];
+      return (
+        retryableMessages.some((msg) => error.message.includes(msg)) || error.name === 'AbortError'
+      );
     }
     return false;
   }

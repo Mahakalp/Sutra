@@ -3,17 +3,15 @@
  *
  * Registers ecosystem knowledge tools and handles MCP protocol via stdio.
  *
- * At startup, calls GET /api/auth/tier to determine which tools to register:
- *   - No API key / invalid key → free tier (3 tools)
- *   - Valid Pro key → pro tier (6 tools)
+ * At startup, fetches entitlement from Yantra API to determine tool access:
+ *   - Canonical entitlement is derived from Firebase claims (per entitlement-sync contract)
+ *   - No direct billing logic — read-only consumer
+ *   - Handles states: active, trialing, past_due, canceled (grace), deleted
  */
 
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import {
-  CallToolRequestSchema,
-  ListToolsRequestSchema,
-} from '@modelcontextprotocol/sdk/types.js';
+import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
 import { YantraClient } from './client.js';
 import { getToolDefinitions, handleToolCall } from './tools.js';
@@ -28,18 +26,24 @@ export async function startServer(config: Partial<SutraConfig> = {}): Promise<vo
     log('Warning: Could not reach Yantra API. Server starting with limited functionality.');
   }
 
-  // Determine tier and available tools at startup
-  const tierInfo = await client.getTier();
-  const toolDefs = getToolDefinitions(tierInfo.tools);
-  const allowedToolNames = new Set(tierInfo.tools);
+  // Fetch entitlement from Yantra API (canonical path from Firebase claims)
+  // This is the read-only consumer pattern - no direct billing mutation
+  const entitlement = await client.getEntitlement();
+  const allowedToolNames = new Set(client.getAllowedTools(entitlement));
+  const toolDefs = getToolDefinitions(Array.from(allowedToolNames));
 
-  if (tierInfo.warning) {
-    log(`Warning: ${tierInfo.warning}`);
+  // Log entitlement state for debugging
+  if (entitlement) {
+    log(
+      `Entitlement: org=${entitlement.org_id}, tier=${entitlement.tier}, status=${entitlement.status}`
+    );
+  } else {
+    log('Entitlement: None (using free tier)');
   }
 
   const server = new Server(
     { name: '@mahakalp/salesforce-mcp', version: '0.2.0' },
-    { capabilities: { tools: {} } },
+    { capabilities: { tools: {} } }
   );
 
   // List available tools — filtered by tier
@@ -55,7 +59,7 @@ export async function startServer(config: Partial<SutraConfig> = {}): Promise<vo
       name,
       (args ?? {}) as Record<string, unknown>,
       client,
-      allowedToolNames,
+      allowedToolNames
     );
 
     if (!result) {
@@ -72,9 +76,10 @@ export async function startServer(config: Partial<SutraConfig> = {}): Promise<vo
   const transport = new StdioServerTransport();
   await server.connect(transport);
 
+  const tierLabel = entitlement ? `${entitlement.tier} (${entitlement.status})` : 'free';
   log('Mahakalp Salesforce MCP server started');
   log(`API: ${config.apiBaseUrl ?? 'https://yantra.mahakalp.dev'}`);
-  log(`Tier: ${tierInfo.tier} (${tierInfo.limits.requests_per_day} req/day)`);
+  log(`Tier: ${tierLabel}`);
   log(`Tools: ${toolDefs.map((t) => t.name).join(', ')}`);
 }
 
