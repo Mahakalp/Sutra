@@ -17,6 +17,8 @@ export interface SutraConfig {
   maxRetries?: number;
   /** Delay between retries in ms (default: 1000) */
   retryDelay?: number;
+  /** Interval for entitlement refresh in ms (default: 300000 = 5 min) */
+  entitlementRefreshInterval?: number;
 }
 
 // ---------------------------------------------------------------------------

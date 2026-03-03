@@ -24,6 +24,22 @@ const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_RETRY_DELAY = 1_000;
 const USER_AGENT = '@mahakalp/salesforce-mcp';
 
+const INTERNAL_ERROR_MESSAGES = [
+  'ECONNRESET',
+  'ECONNREFUSED',
+  'ETIMEDOUT',
+  'ENOTFOUND',
+  'ENETUNREACH',
+  'Yantra API error 5',
+  'Yantra API error 500',
+  'Yantra API error 502',
+  'Yantra API error 503',
+  'timed out',
+  'timeout',
+];
+
+const SANITIZED_MESSAGE = 'An internal error occurred. Please try again later.';
+
 export class YantraClient {
   private readonly baseUrl: string;
   private readonly apiKey?: string;
@@ -283,22 +299,28 @@ export class YantraClient {
 
       if (!response.ok) {
         const text = await response.text().catch(() => '');
-        throw new Error(`Yantra API error ${response.status}: ${text || response.statusText}`);
+        const rawMessage = `Yantra API error ${response.status}: ${text || response.statusText}`;
+        throw new Error(this.sanitizeError(rawMessage));
       }
 
       return (await response.json()) as T;
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error(`Yantra API request timed out after ${this.timeout}ms`, { cause: error });
-      }
-
-      const isRetryable = this.isRetryableError(error);
+      const isRetryable = error instanceof Error && (
+        this.isRetryableError(error) || error.name === 'AbortError'
+      );
+      
       if (isRetryable && attempt < this.maxRetries) {
         await this.delay(this.retryDelay * (attempt + 1));
         return this.request<T>(path, init, attempt + 1);
       }
 
-      throw error;
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error(this.sanitizeError(`Yantra API request timed out after ${this.timeout}ms`), { cause: error });
+        }
+        throw new Error(this.sanitizeError(error.message), { cause: error });
+      }
+      throw new Error(this.sanitizeError(String(error)), { cause: error });
     } finally {
       clearTimeout(timeoutId);
     }
@@ -318,6 +340,14 @@ export class YantraClient {
       );
     }
     return false;
+  }
+
+  private sanitizeError(message: string): string {
+    const isInternalError = INTERNAL_ERROR_MESSAGES.some((msg) => message.includes(msg));
+    if (isInternalError) {
+      return SANITIZED_MESSAGE;
+    }
+    return message;
   }
 
   private delay(ms: number): Promise<void> {

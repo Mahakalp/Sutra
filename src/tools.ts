@@ -244,6 +244,20 @@ export async function handleToolCall(
     return null;
   }
 
+  const toolDef = ALL_TOOLS[name];
+  if (toolDef) {
+    const validationErrors = validateInput(toolDef.inputSchema, args);
+    if (validationErrors.length > 0) {
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({ success: false, error: 'Validation failed', details: validationErrors })
+        }],
+        isError: true,
+      };
+    }
+  }
+
   switch (name) {
     // Free
     case 'mahakalp_sf_constraints':
@@ -423,6 +437,58 @@ async function handleDecisionGuides(
   } catch (error) {
     return errorResult(error);
   }
+}
+
+// =============================================================================
+// Schema Validation
+// =============================================================================
+
+export interface ValidationError {
+  field: string;
+  message: string;
+}
+
+export function validateInput(
+  schema: ToolDefinition['inputSchema'],
+  args: Record<string, unknown>
+): ValidationError[] {
+  const errors: ValidationError[] = [];
+
+  for (const field of schema.required) {
+    if (!(field in args) || args[field] === undefined || args[field] === null || args[field] === '') {
+      errors.push({ field, message: `${field} is required` });
+    }
+  }
+
+  for (const [field, schemaValue] of Object.entries(schema.properties)) {
+    const value = args[field];
+    if (value === undefined || value === null) continue;
+
+    const propSchema = schemaValue as Record<string, unknown>;
+    
+    if (propSchema.type === 'string' && typeof value !== 'string') {
+      errors.push({ field, message: `${field} must be a string` });
+    }
+
+    if (propSchema.type === 'number' && typeof value !== 'number') {
+      errors.push({ field, message: `${field} must be a number` });
+    }
+
+    if (propSchema.type === 'boolean' && typeof value !== 'boolean') {
+      errors.push({ field, message: `${field} must be a boolean` });
+    }
+
+    if (propSchema.type === 'array' && !Array.isArray(value)) {
+      errors.push({ field, message: `${field} must be an array` });
+    }
+
+    const enumValue = propSchema.enum as unknown[] | undefined;
+    if (enumValue && Array.isArray(enumValue) && !enumValue.includes(value)) {
+      errors.push({ field, message: `${field} must be one of: ${enumValue.join(', ')}` });
+    }
+  }
+
+  return errors;
 }
 
 // =============================================================================

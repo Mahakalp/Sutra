@@ -127,14 +127,16 @@ describe('YantraClient', () => {
 
   describe('request timeout', () => {
     it('throws timeout error when request exceeds timeout', async () => {
-      const slowClient = new YantraClient({ timeout: 10 });
+      const slowClient = new YantraClient({ timeout: 10, maxRetries: 0 });
       const abortError = new Error('The operation was aborted.');
       abortError.name = 'AbortError';
       mockFetch.mockImplementation(
         () => new Promise((_, reject) => setTimeout(() => reject(abortError), 20))
       );
 
-      await expect(slowClient.searchDocs({ query: 'test' })).rejects.toThrow('timed out');
+      await expect(slowClient.searchDocs({ query: 'test' })).rejects.toThrow(
+        'An internal error occurred. Please try again later.'
+      );
     });
   });
 
@@ -186,7 +188,9 @@ describe('YantraClient', () => {
       });
       mockFetch.mockRejectedValue(new Error('ECONNRESET'));
 
-      await expect(retryClient.searchDocs({ query: 'test' })).rejects.toThrow('ECONNRESET');
+      await expect(retryClient.searchDocs({ query: 'test' })).rejects.toThrow(
+        'An internal error occurred. Please try again later.'
+      );
     });
   });
 
@@ -442,6 +446,59 @@ describe('YantraClient', () => {
       };
       const tools = client.getAllowedTools(entitlement);
       expect(tools).toEqual(PRO_TOOLS);
+    });
+  });
+
+  describe('error sanitization', () => {
+    it('sanitizes ECONNRESET errors', async () => {
+      const noRetryClient = new YantraClient({ maxRetries: 0, retryDelay: 10 });
+      mockFetch.mockRejectedValue(new Error('ECONNRESET'));
+      await expect(noRetryClient.searchDocs({ query: 'test' })).rejects.toThrow(
+        'An internal error occurred. Please try again later.'
+      );
+    });
+
+    it('sanitizes ECONNREFUSED errors', async () => {
+      const noRetryClient = new YantraClient({ maxRetries: 0, retryDelay: 10 });
+      mockFetch.mockRejectedValue(new Error('ECONNREFUSED'));
+      await expect(noRetryClient.searchDocs({ query: 'test' })).rejects.toThrow(
+        'An internal error occurred. Please try again later.'
+      );
+    });
+
+    it('sanitizes server errors (500, 502, 503)', async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        text: () => Promise.resolve('stack trace details'),
+      });
+      await expect(client.searchDocs({ query: 'test' })).rejects.toThrow(
+        'An internal error occurred. Please try again later.'
+      );
+    });
+
+    it('preserves user-facing error messages', async () => {
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized',
+        text: () => Promise.resolve(''),
+      });
+      await expect(client.searchDocs({ query: 'test' })).rejects.toThrow('Yantra API error 401');
+    });
+
+    it('sanitizes timeout errors', async () => {
+      const slowClient = new YantraClient({ timeout: 10, maxRetries: 0 });
+      const abortError = new Error('The operation was aborted.');
+      abortError.name = 'AbortError';
+      mockFetch.mockImplementation(
+        () => new Promise((_, reject) => setTimeout(() => reject(abortError), 20))
+      );
+
+      await expect(slowClient.searchDocs({ query: 'test' })).rejects.toThrow(
+        'An internal error occurred. Please try again later.'
+      );
     });
   });
 });

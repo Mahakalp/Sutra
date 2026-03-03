@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { YantraClient } from './client.js';
-import { getToolDefinitions, handleToolCall } from './tools.js';
+import { getToolDefinitions, handleToolCall, validateInput } from './tools.js';
 
 describe('tools', () => {
   describe('getToolDefinitions', () => {
@@ -131,6 +131,111 @@ describe('tools', () => {
       const allowedTools = new Set(['mahakalp_sf_constraints']);
       const result = await handleToolCall('unknown_tool', {}, mockClient, allowedTools);
       expect(result).toBeNull();
+    });
+  });
+
+  describe('validateInput', () => {
+    it('returns no errors for valid input', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          query: { type: 'string' as const },
+          max_results: { type: 'number' as const },
+        },
+        required: ['query'],
+      };
+      const errors = validateInput(schema, { query: 'test', max_results: 10 });
+      expect(errors).toHaveLength(0);
+    });
+
+    it('returns error for missing required field', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          query: { type: 'string' as const },
+        },
+        required: ['query'],
+      };
+      const errors = validateInput(schema, {});
+      expect(errors).toHaveLength(1);
+      expect(errors[0].field).toBe('query');
+    });
+
+    it('returns error for wrong type', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          query: { type: 'string' as const },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { query: 123 });
+      expect(errors).toHaveLength(1);
+      expect(errors[0].message).toContain('must be a string');
+    });
+
+    it('returns error for invalid enum value', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          constraint_type: { type: 'string' as const, enum: ['governor_limit', 'platform_rule'] },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { constraint_type: 'invalid' });
+      expect(errors).toHaveLength(1);
+      expect(errors[0].message).toContain('must be one of');
+    });
+
+    it('returns no errors for valid enum value', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          constraint_type: { type: 'string' as const, enum: ['governor_limit', 'platform_rule'] },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { constraint_type: 'governor_limit' });
+      expect(errors).toHaveLength(0);
+    });
+
+    it('validates array type', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          topics: { type: 'array' as const, items: { type: 'string' } },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { topics: 'not-array' });
+      expect(errors).toHaveLength(1);
+      expect(errors[0].message).toContain('must be an array');
+    });
+
+    it('validates boolean type', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          include_archived: { type: 'boolean' as const },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { include_archived: 'true' });
+      expect(errors).toHaveLength(1);
+      expect(errors[0].message).toContain('must be a boolean');
+    });
+
+    it('returns multiple errors for multiple issues', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          query: { type: 'string' as const },
+          max_results: { type: 'number' as const },
+        },
+        required: ['query'],
+      };
+      const errors = validateInput(schema, { query: 123, max_results: 'ten' });
+      expect(errors).toHaveLength(2);
     });
   });
 });

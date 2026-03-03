@@ -18,6 +18,8 @@ export default [
         process: 'readonly',
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly',
         fetch: 'readonly',
         URLSearchParams: 'readonly',
         RequestInit: 'readonly',
