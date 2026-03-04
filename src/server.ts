@@ -17,14 +17,17 @@ import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprot
 
 import { YantraClient } from './client.js';
 import { getToolDefinitions, handleToolCall } from './tools.js';
-import type { SutraConfig } from './types.js';
+import type { SutraConfig, Entitlement } from './types.js';
 
 const DEFAULT_ENTITLEMENT_REFRESH_INTERVAL = 300_000; // 5 minutes
+const DEFAULT_STALE_THRESHOLD = 600_000; // 10 minutes
 
 interface ServerState {
   allowedToolNames: Set<string>;
   toolDefs: ReturnType<typeof getToolDefinitions>;
-  entitlement: Awaited<ReturnType<YantraClient['getEntitlement']>>;
+  entitlement: Entitlement | null;
+  lastKnownGoodEntitlement: Entitlement | null;
+  lastRefreshTimestamp: number | null;
   refreshIntervalId?: ReturnType<typeof setInterval>;
 }
 
@@ -41,6 +44,8 @@ export async function startServer(config: Partial<SutraConfig> = {}): Promise<vo
     allowedToolNames: new Set(),
     toolDefs: [],
     entitlement: null,
+    lastKnownGoodEntitlement: null,
+    lastRefreshTimestamp: null,
   };
 
   // Initial entitlement fetch
@@ -83,9 +88,10 @@ export async function startServer(config: Partial<SutraConfig> = {}): Promise<vo
 
   // Start periodic entitlement refresh
   const refreshInterval = config.entitlementRefreshInterval ?? DEFAULT_ENTITLEMENT_REFRESH_INTERVAL;
+  const staleThreshold = config.entitlementStaleThreshold ?? DEFAULT_STALE_THRESHOLD;
   serverState.refreshIntervalId = setInterval(async () => {
     log('Refreshing entitlement...');
-    await refreshEntitlement(client, serverState);
+    await refreshEntitlement(client, serverState, staleThreshold);
   }, refreshInterval);
 
   const tierLabel = serverState.entitlement ? `${serverState.entitlement.tier} (${serverState.entitlement.status})` : 'free';
@@ -98,26 +104,60 @@ export async function startServer(config: Partial<SutraConfig> = {}): Promise<vo
 
 async function refreshEntitlement(
   client: YantraClient,
-  serverState: ServerState
+  serverState: ServerState,
+  staleThreshold: number = DEFAULT_STALE_THRESHOLD
 ): Promise<void> {
+  const now = Date.now();
+  const isStale = serverState.lastRefreshTimestamp !== null && 
+    (now - serverState.lastRefreshTimestamp) > staleThreshold;
+
   try {
     const entitlement = await client.getEntitlement();
-    serverState.entitlement = entitlement;
-    serverState.allowedToolNames = new Set(client.getAllowedTools(entitlement));
+    
+    if (entitlement) {
+      serverState.entitlement = entitlement;
+      serverState.lastKnownGoodEntitlement = entitlement;
+      serverState.lastRefreshTimestamp = now;
+    } else if (isStale && serverState.lastKnownGoodEntitlement) {
+      serverState.entitlement = serverState.lastKnownGoodEntitlement;
+      log('Entitlement refresh returned null, but cached entitlement is still valid');
+    } else if (serverState.lastKnownGoodEntitlement && !isStale) {
+      serverState.entitlement = serverState.lastKnownGoodEntitlement;
+      log('Entitlement refresh failed, preserving last known good entitlement');
+    } else {
+      serverState.entitlement = null;
+    }
+    
+    serverState.allowedToolNames = new Set(client.getAllowedTools(serverState.entitlement));
     serverState.toolDefs = getToolDefinitions(Array.from(serverState.allowedToolNames));
 
-    if (entitlement) {
+    if (serverState.entitlement) {
       log(
-        `Entitlement refreshed: org=${entitlement.org_id}, tier=${entitlement.tier}, status=${entitlement.status}`
+        `Entitlement refreshed: org=${serverState.entitlement.org_id}, tier=${serverState.entitlement.tier}, status=${serverState.entitlement.status}`
       );
     } else {
       log('Entitlement refreshed: None (using free tier)');
     }
   } catch (error) {
-    log(`Entitlement refresh failed: ${error instanceof Error ? error.message : String(error)}`);
-    // Keep existing entitlement on refresh failure
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    log(`Entitlement refresh failed: ${errorMessage}`);
+    
+    if (serverState.lastKnownGoodEntitlement) {
+      if (isStale) {
+        log('Stale threshold exceeded with no valid entitlement - using last known good');
+      }
+      serverState.entitlement = serverState.lastKnownGoodEntitlement;
+    } else {
+      serverState.entitlement = null;
+      log('Entitlement refresh failed with no cached entitlement - using free tier');
+    }
+    
+    serverState.allowedToolNames = new Set(client.getAllowedTools(serverState.entitlement));
+    serverState.toolDefs = getToolDefinitions(Array.from(serverState.allowedToolNames));
   }
 }
+
+export { refreshEntitlement };
 
 /** Log to stderr (stdout is reserved for MCP JSON-RPC) */
 function log(message: string): void {

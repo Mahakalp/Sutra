@@ -19,6 +19,8 @@ export interface SutraConfig {
   retryDelay?: number;
   /** Interval for entitlement refresh in ms (default: 300000 = 5 min) */
   entitlementRefreshInterval?: number;
+  /** Stale threshold in ms - how long to use cached entitlement before considering it stale (default: 600000 = 10 min) */
+  entitlementStaleThreshold?: number;
 }
 
 // ---------------------------------------------------------------------------
