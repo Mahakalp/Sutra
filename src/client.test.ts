@@ -323,8 +323,7 @@ describe('YantraClient', () => {
         retryDelay: 100,
       });
       let callCount = 0;
-      const delays: number[] = [];
-      
+
       mockFetch.mockImplementation(() => {
         callCount++;
         if (callCount < 4) {
