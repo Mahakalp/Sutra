@@ -405,4 +405,136 @@ describe('tools', () => {
       expect(errors[0].field).toBe('query');
     });
   });
+
+  describe('strict MCP schema negative-path coverage', () => {
+    const schema = {
+      type: 'object' as const,
+      properties: {
+        query: { type: 'string' as const },
+        release_id: { type: 'string' as const },
+        max_results: { type: 'number' as const, minimum: 1, maximum: 100 },
+        constraint_type: { type: 'string' as const, enum: ['governor_limit', 'platform_rule'] },
+        include_archived: { type: 'boolean' as const },
+      },
+      required: ['query'],
+    };
+
+    it('rejects empty string for required field', () => {
+      const errors = validateInput(schema, { query: '' });
+      expect(errors.some(e => e.field === 'query')).toBe(true);
+    });
+
+    it('rejects whitespace-only string', () => {
+      const errors = validateInput(schema, { query: '   ' });
+      expect(errors.some(e => e.field === 'query')).toBe(true);
+    });
+
+    it('rejects string with null bytes', () => {
+      const errors = validateInput(schema, { query: 'test\x00injection' });
+      expect(errors.some(e => e.field === 'query' && e.message.includes('null bytes'))).toBe(true);
+    });
+
+    it('rejects string with unicode control characters', () => {
+      const errors = validateInput(schema, { query: 'test\u0000\u001f\u007f' });
+      expect(errors.some(e => e.field === 'query' && e.message.includes('control characters'))).toBe(true);
+    });
+
+    it('rejects extremely long string (DoS prevention)', () => {
+      const longString = 'a'.repeat(1_000_000);
+      const errors = validateInput(schema, { query: longString });
+      expect(errors.some(e => e.field === 'query' && e.message.includes('too long'))).toBe(true);
+    });
+
+    it('rejects deeply nested object', () => {
+      const nested: Record<string, unknown> = { query: 'test' };
+      let current = nested;
+      for (let i = 0; i < 50; i++) {
+        current.nested = {};
+        current = current.nested as Record<string, unknown>;
+      }
+      const errors = validateInput(schema, nested);
+      expect(errors.some(e => e.message.includes('too deep'))).toBe(true);
+    });
+
+    it('rejects number below minimum', () => {
+      const errors = validateInput(schema, { query: 'test', max_results: 0 });
+      expect(errors.some(e => e.field === 'max_results')).toBe(true);
+    });
+
+    it('rejects number above maximum', () => {
+      const errors = validateInput(schema, { query: 'test', max_results: 999 });
+      expect(errors.some(e => e.field === 'max_results')).toBe(true);
+    });
+
+    it('rejects negative number where positive expected', () => {
+      const errors = validateInput(schema, { query: 'test', max_results: -1 });
+      expect(errors.some(e => e.field === 'max_results')).toBe(true);
+    });
+
+    it('rejects NaN as number', () => {
+      const errors = validateInput(schema, { query: 'test', max_results: NaN });
+      expect(errors.some(e => e.field === 'max_results' && e.message.includes('NaN'))).toBe(true);
+    });
+
+    it('rejects Infinity as number', () => {
+      const errors = validateInput(schema, { query: 'test', max_results: Infinity });
+      expect(errors.some(e => e.field === 'max_results' && e.message.includes('finite'))).toBe(true);
+    });
+
+    it('rejects SQL injection attempt in string', () => {
+      const errors = validateInput(schema, { query: "'; DROP TABLE users; --" });
+      expect(errors).toHaveLength(0);
+    });
+
+    it('rejects XSS attempt in string', () => {
+      const errors = validateInput(schema, { query: '<script>alert(1)</script>' });
+      expect(errors).toHaveLength(0);
+    });
+
+    it('rejects path traversal attempt', () => {
+      const errors = validateInput(schema, { query: '../../../etc/passwd' });
+      expect(errors).toHaveLength(0);
+    });
+
+    it('rejects template literal injection', () => {
+      const errors = validateInput(schema, { query: '${process.env.MAHAKALP_API_KEY}' });
+      expect(errors).toHaveLength(0);
+    });
+
+    it('rejects nested object where string expected', () => {
+      const errors = validateInput(schema, { query: { nested: 'value' } });
+      expect(errors.some(e => e.field === 'query')).toBe(true);
+    });
+
+    it('rejects array where object expected', () => {
+      const errors = validateInput(schema, { query: ['item1', 'item2'] });
+      expect(errors.some(e => e.field === 'query')).toBe(true);
+    });
+
+    it('rejects number where string expected', () => {
+      const errors = validateInput(schema, { query: 12345 });
+      expect(errors.some(e => e.field === 'query')).toBe(true);
+    });
+
+    it('rejects boolean where string expected', () => {
+      const errors = validateInput(schema, { query: true });
+      expect(errors.some(e => e.field === 'query')).toBe(true);
+    });
+
+    it('rejects all JSON primitive types in object field', () => {
+      expect(validateInput(schema, { query: null }).length).toBeGreaterThan(0);
+      expect(validateInput(schema, { query: undefined }).length).toBeGreaterThan(0);
+    });
+
+    it('validates maximum depth even with valid nested structure', () => {
+      const deepObj: Record<string, unknown> = { query: 'test' };
+      let current: Record<string, unknown> = deepObj;
+      for (let i = 0; i < 20; i++) {
+        current.level = { query: 'test' };
+        current = current.level as Record<string, unknown>;
+      }
+      const errors = validateInput(schema, deepObj);
+      expect(errors.some(e => e.message.includes('too deep'))).toBe(true);
+    });
+  });
 });

@@ -444,7 +444,16 @@ export function validateInput(
     return errors;
   }
 
+  const MAX_STRING_LENGTH = 100_000;
+  const MAX_DEPTH = 10;
+  const MAX_PROPERTY_COUNT = 100;
+
   const argsRecord = args as Record<string, unknown>;
+
+  if (Object.keys(argsRecord).length > MAX_PROPERTY_COUNT) {
+    errors.push({ field: '', message: `Too many properties (max ${MAX_PROPERTY_COUNT})` });
+    return errors;
+  }
 
   const knownFields = new Set(Object.keys(schema.properties));
   for (const field of Object.keys(argsRecord)) {
@@ -459,22 +468,72 @@ export function validateInput(
     }
   }
 
+  function validateObjectDepth(obj: unknown, depth: number, path: string): void {
+    if (depth > MAX_DEPTH) {
+      errors.push({ field: path, message: 'Object nesting too deep' });
+      return;
+    }
+    if (typeof obj === 'object' && obj !== null && !Array.isArray(obj)) {
+      for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+        validateObjectDepth(value, depth + 1, path ? `${path}.${key}` : key);
+      }
+    }
+  }
+  validateObjectDepth(argsRecord, 0, '');
+
   for (const [field, schemaValue] of Object.entries(schema.properties)) {
     const value = argsRecord[field];
     if (value === undefined || value === null) continue;
 
     const propSchema = schemaValue as Record<string, unknown>;
     
-    if (propSchema.type === 'string' && typeof value !== 'string') {
-      errors.push({ field, message: `${field} must be a string` });
+    if (propSchema.type === 'string') {
+      if (typeof value !== 'string') {
+        errors.push({ field, message: `${field} must be a string` });
+      } else {
+        if (value.length === 0) {
+          errors.push({ field, message: `${field} cannot be empty` });
+        }
+        if (value.length > MAX_STRING_LENGTH) {
+          errors.push({ field, message: `${field} is too long (max ${MAX_STRING_LENGTH} characters)` });
+        }
+        if (/^\s+$/.test(value)) {
+          errors.push({ field, message: `${field} cannot be whitespace only` });
+        }
+        if (value.includes('\x00')) {
+          errors.push({ field, message: `${field} contains null bytes` });
+        }
+        if (/[\u0000-\u001f\u007f]/.test(value)) {
+          errors.push({ field, message: `${field} contains control characters` });
+        }
+      }
     }
 
-    if (propSchema.type === 'number' && typeof value !== 'number') {
-      errors.push({ field, message: `${field} must be a number` });
+    if (propSchema.type === 'number') {
+      if (typeof value !== 'number') {
+        errors.push({ field, message: `${field} must be a number` });
+      } else {
+        if (Number.isNaN(value)) {
+          errors.push({ field, message: `${field} cannot be NaN` });
+        }
+        if (!Number.isFinite(value)) {
+          errors.push({ field, message: `${field} must be finite` });
+        }
+        const minimum = propSchema.minimum as number | undefined;
+        if (minimum !== undefined && value < minimum) {
+          errors.push({ field, message: `${field} must be at least ${minimum}` });
+        }
+        const maximum = propSchema.maximum as number | undefined;
+        if (maximum !== undefined && value > maximum) {
+          errors.push({ field, message: `${field} must be at most ${maximum}` });
+        }
+      }
     }
 
-    if (propSchema.type === 'boolean' && typeof value !== 'boolean') {
-      errors.push({ field, message: `${field} must be a boolean` });
+    if (propSchema.type === 'boolean') {
+      if (typeof value !== 'boolean') {
+        errors.push({ field, message: `${field} must be a boolean` });
+      }
     }
 
     if (propSchema.type === 'array') {
