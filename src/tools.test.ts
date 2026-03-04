@@ -237,5 +237,172 @@ describe('tools', () => {
       const errors = validateInput(schema, { query: 123, max_results: 'ten' });
       expect(errors).toHaveLength(2);
     });
+
+    it('rejects non-object args', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: { query: { type: 'string' as const } },
+        required: ['query'],
+      };
+      expect(validateInput(schema, null)).toHaveLength(1);
+      expect(validateInput(schema, undefined)).toHaveLength(1);
+      expect(validateInput(schema, 'string')).toHaveLength(1);
+      expect(validateInput(schema, 123)).toHaveLength(1);
+      expect(validateInput(schema, [])).toHaveLength(1);
+    });
+
+    it('rejects unknown fields', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          query: { type: 'string' as const },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { query: 'test', unknown_field: 'bad' });
+      expect(errors).toHaveLength(1);
+      expect(errors[0].field).toBe('unknown_field');
+      expect(errors[0].message).toContain('Unknown field');
+    });
+
+    it('rejects multiple unknown fields', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          query: { type: 'string' as const },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { query: 'test', foo: 'bar', baz: 123 });
+      expect(errors).toHaveLength(2);
+      expect(errors.map(e => e.field).sort()).toEqual(['baz', 'foo']);
+    });
+
+    it('validates array item types - string items', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          topics: { type: 'array' as const, items: { type: 'string' as const } },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { topics: ['valid', 'array'] });
+      expect(errors).toHaveLength(0);
+    });
+
+    it('rejects array with wrong item types', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          topics: { type: 'array' as const, items: { type: 'string' as const } },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { topics: ['valid', 123, 'also valid'] });
+      expect(errors).toHaveLength(1);
+      expect(errors[0].message).toContain('topics[1] must be a string');
+    });
+
+    it('rejects array with wrong item types for multiple items', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          constraint_ids: { type: 'array' as const, items: { type: 'string' as const } },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { constraint_ids: [1, 2, 3] });
+      expect(errors).toHaveLength(3);
+      expect(errors[0].message).toContain('constraint_ids[0] must be a string');
+      expect(errors[1].message).toContain('constraint_ids[1] must be a string');
+      expect(errors[2].message).toContain('constraint_ids[2] must be a string');
+    });
+
+    it('validates array with number items', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          numbers: { type: 'array' as const, items: { type: 'number' as const } },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { numbers: [1, 2, 3] });
+      expect(errors).toHaveLength(0);
+    });
+
+    it('rejects array with wrong number item types', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          numbers: { type: 'array' as const, items: { type: 'number' as const } },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { numbers: ['not', 'numbers'] });
+      expect(errors).toHaveLength(2);
+    });
+
+    it('validates array with boolean items', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          flags: { type: 'array' as const, items: { type: 'boolean' as const } },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { flags: [true, false, true] });
+      expect(errors).toHaveLength(0);
+    });
+
+    it('rejects array with wrong boolean item types', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          flags: { type: 'array' as const, items: { type: 'boolean' as const } },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, { flags: [true, 'false', 1] });
+      expect(errors).toHaveLength(2);
+    });
+
+    it('returns error for unknown field and wrong type together', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          query: { type: 'string' as const },
+        },
+        required: ['query'],
+      };
+      const errors = validateInput(schema, { query: 123, unknown: 'bad' });
+      expect(errors).toHaveLength(2);
+      const fields = errors.map(e => e.field).sort();
+      expect(fields).toEqual(['query', 'unknown']);
+    });
+
+    it('handles empty object with no required fields', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          query: { type: 'string' as const },
+        },
+        required: [],
+      };
+      const errors = validateInput(schema, {});
+      expect(errors).toHaveLength(0);
+    });
+
+    it('handles empty object with required fields missing', () => {
+      const schema = {
+        type: 'object' as const,
+        properties: {
+          query: { type: 'string' as const },
+        },
+        required: ['query'],
+      };
+      const errors = validateInput(schema, {});
+      expect(errors).toHaveLength(1);
+      expect(errors[0].field).toBe('query');
+    });
   });
 });

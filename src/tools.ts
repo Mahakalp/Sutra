@@ -435,18 +435,32 @@ export interface ValidationError {
 
 export function validateInput(
   schema: ToolDefinition['inputSchema'],
-  args: Record<string, unknown>
+  args: unknown
 ): ValidationError[] {
   const errors: ValidationError[] = [];
 
+  if (typeof args !== 'object' || args === null || Array.isArray(args)) {
+    errors.push({ field: '', message: 'Input must be a non-null, non-array object' });
+    return errors;
+  }
+
+  const argsRecord = args as Record<string, unknown>;
+
+  const knownFields = new Set(Object.keys(schema.properties));
+  for (const field of Object.keys(argsRecord)) {
+    if (!knownFields.has(field)) {
+      errors.push({ field, message: `Unknown field: ${field}` });
+    }
+  }
+
   for (const field of schema.required) {
-    if (!(field in args) || args[field] === undefined || args[field] === null || args[field] === '') {
+    if (!(field in argsRecord) || argsRecord[field] === undefined || argsRecord[field] === null || argsRecord[field] === '') {
       errors.push({ field, message: `${field} is required` });
     }
   }
 
   for (const [field, schemaValue] of Object.entries(schema.properties)) {
-    const value = args[field];
+    const value = argsRecord[field];
     if (value === undefined || value === null) continue;
 
     const propSchema = schemaValue as Record<string, unknown>;
@@ -463,8 +477,26 @@ export function validateInput(
       errors.push({ field, message: `${field} must be a boolean` });
     }
 
-    if (propSchema.type === 'array' && !Array.isArray(value)) {
-      errors.push({ field, message: `${field} must be an array` });
+    if (propSchema.type === 'array') {
+      if (!Array.isArray(value)) {
+        errors.push({ field, message: `${field} must be an array` });
+      } else {
+        const itemSchema = propSchema.items as Record<string, unknown> | undefined;
+        if (itemSchema) {
+          const itemType = itemSchema.type as string | undefined;
+          value.forEach((item, index) => {
+            if (itemType === 'string' && typeof item !== 'string') {
+              errors.push({ field, message: `${field}[${index}] must be a string` });
+            }
+            if (itemType === 'number' && typeof item !== 'number') {
+              errors.push({ field, message: `${field}[${index}] must be a number` });
+            }
+            if (itemType === 'boolean' && typeof item !== 'boolean') {
+              errors.push({ field, message: `${field}[${index}] must be a boolean` });
+            }
+          });
+        }
+      }
     }
 
     const enumValue = propSchema.enum as unknown[] | undefined;
