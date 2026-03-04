@@ -66,18 +66,17 @@ export class YantraClient {
   /**
    * Check tier at startup. Returns available tools based on API key.
    * Never throws — returns free tier on any error.
+   * Uses getToolNamesByTier from tools.ts as single source of truth.
    */
   async getTier(): Promise<TierResponse> {
-    const FREE_FALLBACK: TierResponse = {
-      tier: 'free',
-      tools: ['mahakalp_sf_constraints', 'mahakalp_sf_doc_search', 'mahakalp_sf_releases'],
-      limits: { requests_per_day: 100 },
-    };
-
     try {
       return await this.get<TierResponse>('/api/auth/tier');
     } catch {
-      return FREE_FALLBACK;
+      return {
+        tier: 'free',
+        tools: getToolNamesByTier('free'),
+        limits: { requests_per_day: 100 },
+      };
     }
   }
 

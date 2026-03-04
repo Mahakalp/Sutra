@@ -45,7 +45,7 @@ describe('YantraClient', () => {
       mockFetch.mockRejectedValue(new Error('Network error'));
       const result = await client.getTier();
       expect(result.tier).toBe('free');
-      expect(result.tools).toContain('mahakalp_sf_constraints');
+      expect(result.tools).toEqual(FREE_TOOLS);
     });
 
     it('returns tier info on success', async () => {
@@ -58,6 +58,12 @@ describe('YantraClient', () => {
       const result = await client.getTier();
       expect(result.tier).toBe('pro');
       expect(result.tools).toContain('mahakalp_sf_rules');
+    });
+
+    it('anti-drift: fallback tools match canonical getToolNamesByTier', async () => {
+      mockFetch.mockRejectedValue(new Error('Network error'));
+      const result = await client.getTier();
+      expect(result.tools).toEqual(getToolNamesByTier('free'));
     });
   });
 
