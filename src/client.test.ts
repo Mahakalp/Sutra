@@ -186,6 +186,168 @@ describe('YantraClient', () => {
         'An internal error occurred. Please try again later.'
       );
     });
+
+    it('retries on 429 Too Many Requests', async () => {
+      const retryClient = new YantraClient({
+        apiBaseUrl: 'https://test.mahakalp.dev',
+        maxRetries: 3,
+        retryDelay: 10,
+      });
+      let callCount = 0;
+      mockFetch.mockImplementation(() => {
+        callCount++;
+        if (callCount < 3) {
+          return Promise.resolve({
+            ok: false,
+            status: 429,
+            statusText: 'Too Many Requests',
+            text: () => Promise.resolve('Rate limit exceeded'),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true, results: [], count: 0, query: 'test' }),
+        });
+      });
+
+      const result = await retryClient.searchDocs({ query: 'test' });
+      expect(callCount).toBe(3);
+      expect(result.success).toBe(true);
+    });
+
+    it('retries on 500 Internal Server Error', async () => {
+      const retryClient = new YantraClient({
+        apiBaseUrl: 'https://test.mahakalp.dev',
+        maxRetries: 3,
+        retryDelay: 10,
+      });
+      let callCount = 0;
+      mockFetch.mockImplementation(() => {
+        callCount++;
+        if (callCount < 2) {
+          return Promise.resolve({
+            ok: false,
+            status: 500,
+            statusText: 'Internal Server Error',
+            text: () => Promise.resolve('Database connection failed'),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true, results: [], count: 0, query: 'test' }),
+        });
+      });
+
+      const result = await retryClient.searchDocs({ query: 'test' });
+      expect(callCount).toBe(2);
+      expect(result.success).toBe(true);
+    });
+
+    it('retries on 502 Bad Gateway', async () => {
+      const retryClient = new YantraClient({
+        apiBaseUrl: 'https://test.mahakalp.dev',
+        maxRetries: 3,
+        retryDelay: 10,
+      });
+      let callCount = 0;
+      mockFetch.mockImplementation(() => {
+        callCount++;
+        if (callCount < 2) {
+          return Promise.resolve({
+            ok: false,
+            status: 502,
+            statusText: 'Bad Gateway',
+            text: () => Promise.resolve('Upstream server unavailable'),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true, results: [], count: 0, query: 'test' }),
+        });
+      });
+
+      const result = await retryClient.searchDocs({ query: 'test' });
+      expect(callCount).toBe(2);
+      expect(result.success).toBe(true);
+    });
+
+    it('retries on 503 Service Unavailable', async () => {
+      const retryClient = new YantraClient({
+        apiBaseUrl: 'https://test.mahakalp.dev',
+        maxRetries: 3,
+        retryDelay: 10,
+      });
+      let callCount = 0;
+      mockFetch.mockImplementation(() => {
+        callCount++;
+        if (callCount < 2) {
+          return Promise.resolve({
+            ok: false,
+            status: 503,
+            statusText: 'Service Unavailable',
+            text: () => Promise.resolve('Server overloaded'),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true, results: [], count: 0, query: 'test' }),
+        });
+      });
+
+      const result = await retryClient.searchDocs({ query: 'test' });
+      expect(callCount).toBe(2);
+      expect(result.success).toBe(true);
+    });
+
+    it('does not retry on non-retryable HTTP errors', async () => {
+      const retryClient = new YantraClient({
+        apiBaseUrl: 'https://test.mahakalp.dev',
+        maxRetries: 3,
+        retryDelay: 10,
+      });
+      mockFetch.mockResolvedValue({
+        ok: false,
+        status: 400,
+        statusText: 'Bad Request',
+        text: () => Promise.resolve('Invalid query parameters'),
+      });
+
+      await expect(retryClient.searchDocs({ query: 'test' })).rejects.toThrow('Yantra API error 400');
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+    });
+
+    it('uses bounded exponential backoff with jitter', async () => {
+      const retryClient = new YantraClient({
+        apiBaseUrl: 'https://test.mahakalp.dev',
+        maxRetries: 3,
+        retryDelay: 100,
+      });
+      let callCount = 0;
+      const delays: number[] = [];
+      
+      mockFetch.mockImplementation(() => {
+        callCount++;
+        if (callCount < 4) {
+          return Promise.resolve({
+            ok: false,
+            status: 429,
+            statusText: 'Too Many Requests',
+            text: () => Promise.resolve(''),
+          });
+        }
+        return Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ success: true, results: [], count: 0, query: 'test' }),
+        });
+      });
+
+      const startTime = Date.now();
+      await retryClient.searchDocs({ query: 'test' });
+      const totalTime = Date.now() - startTime;
+
+      expect(callCount).toBe(4);
+      expect(totalTime).toBeGreaterThan(100);
+    });
   });
 
   describe('healthCheck', () => {
@@ -460,14 +622,15 @@ describe('YantraClient', () => {
       );
     });
 
-    it('sanitizes server errors (500, 502, 503)', async () => {
+    it('sanitizes server errors (500, 502, 503) when retries are disabled', async () => {
+      const noRetryClient = new YantraClient({ maxRetries: 0 });
       mockFetch.mockResolvedValue({
         ok: false,
         status: 500,
         statusText: 'Internal Server Error',
         text: () => Promise.resolve('stack trace details'),
       });
-      await expect(client.searchDocs({ query: 'test' })).rejects.toThrow(
+      await expect(noRetryClient.searchDocs({ query: 'test' })).rejects.toThrow(
         'An internal error occurred. Please try again later.'
       );
     });

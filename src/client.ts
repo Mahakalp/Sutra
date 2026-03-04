@@ -23,7 +23,10 @@ const DEFAULT_API_URL = 'https://yantra.mahakalp.dev';
 const DEFAULT_TIMEOUT = 10_000;
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_RETRY_DELAY = 1_000;
+const MAX_RETRY_DELAY = 30_000;
 const USER_AGENT = '@mahakalp/salesforce-mcp';
+
+const HTTP_RETRYABLE_STATUSES = [429, 500, 502, 503];
 
 const INTERNAL_ERROR_MESSAGES = [
   'ECONNRESET',
@@ -291,9 +294,9 @@ export class YantraClient {
         const text = await response.text().catch(() => '');
         const status = response.status;
         
-        const isRetryableHttpStatus = status === 429;
-        if (isRetryableHttpStatus && attempt < this.maxRetries) {
-          await this.delay(this.retryDelay * (attempt + 1));
+        if (this.isRetryableHttpStatus(status) && attempt < this.maxRetries) {
+          const delay = this.calculateRetryDelay(attempt);
+          await this.delay(delay);
           return this.request<T>(path, init, attempt + 1);
         }
         
@@ -308,7 +311,8 @@ export class YantraClient {
       );
       
       if (isRetryable && attempt < this.maxRetries) {
-        await this.delay(this.retryDelay * (attempt + 1));
+        const delay = this.calculateRetryDelay(attempt);
+        await this.delay(delay);
         return this.request<T>(path, init, attempt + 1);
       }
 
@@ -338,6 +342,17 @@ export class YantraClient {
       );
     }
     return false;
+  }
+
+  private isRetryableHttpStatus(status: number): boolean {
+    return HTTP_RETRYABLE_STATUSES.includes(status);
+  }
+
+  private calculateRetryDelay(attempt: number): number {
+    const exponentialDelay = this.retryDelay * Math.pow(2, attempt);
+    const jitter = Math.random() * 0.3 * exponentialDelay;
+    const delayWithJitter = exponentialDelay + jitter;
+    return Math.min(delayWithJitter, MAX_RETRY_DELAY);
   }
 
   private sanitizeError(message: string): string {
