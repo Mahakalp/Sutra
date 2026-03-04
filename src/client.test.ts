@@ -1,20 +1,14 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { YantraClient } from './client.js';
+import { getToolNamesByTier } from './tools.js';
 import type { Entitlement } from './types.js';
 
 const mockFetch = vi.fn();
 globalThis.fetch = mockFetch;
 
-const FREE_TOOLS = ['mahakalp_sf_constraints', 'mahakalp_sf_doc_search', 'mahakalp_sf_releases'];
+const FREE_TOOLS = getToolNamesByTier('free');
 
-const PRO_TOOLS = [
-  'mahakalp_sf_constraints',
-  'mahakalp_sf_doc_search',
-  'mahakalp_sf_releases',
-  'mahakalp_sf_rules',
-  'mahakalp_sf_patterns',
-  'mahakalp_sf_decision_guides',
-];
+const PRO_TOOLS = getToolNamesByTier('pro');
 
 describe('YantraClient', () => {
   let client: YantraClient;

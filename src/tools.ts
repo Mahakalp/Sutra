@@ -17,6 +17,7 @@ import type { YantraClient } from './client.js';
 export interface ToolDefinition {
   name: string;
   description: string;
+  tier: 'free' | 'pro';
   inputSchema: {
     type: 'object';
     properties: Record<string, unknown>;
@@ -35,6 +36,7 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
 
   mahakalp_sf_constraints: {
     name: 'mahakalp_sf_constraints',
+    tier: 'free',
     description:
       'Get Salesforce platform constraints including governor limits, platform rules, and best practices. Returns structured data with limit values, context, workarounds, and code examples. Powered by Mahakalp.dev',
     inputSchema: {
@@ -70,6 +72,7 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
 
   mahakalp_sf_doc_search: {
     name: 'mahakalp_sf_doc_search',
+    tier: 'free',
     description:
       'Search Salesforce official documentation using semantic search. Returns relevant documentation chunks for RAG context. Useful for answering questions about Apex, LWC, SOQL, or any Salesforce platform feature. Powered by Mahakalp.dev',
     inputSchema: {
@@ -100,6 +103,7 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
 
   mahakalp_sf_releases: {
     name: 'mahakalp_sf_releases',
+    tier: 'free',
     description:
       'Get information about Salesforce releases. Returns release metadata including API version, status, and release dates. Powered by Mahakalp.dev',
     inputSchema: {
@@ -128,6 +132,7 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
 
   mahakalp_sf_rules: {
     name: 'mahakalp_sf_rules',
+    tier: 'pro',
     description:
       'Query Salesforce best practice rules and coding standards. Returns rules with severity, category, and code examples. Use this to validate code against platform best practices. Requires Sutra Pro. Powered by Mahakalp.dev',
     inputSchema: {
@@ -161,6 +166,7 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
 
   mahakalp_sf_patterns: {
     name: 'mahakalp_sf_patterns',
+    tier: 'pro',
     description:
       'Search reusable Salesforce code patterns and implementation templates using semantic search. Returns patterns with code examples and context. Requires Sutra Pro. Powered by Mahakalp.dev',
     inputSchema: {
@@ -189,6 +195,7 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
 
   mahakalp_sf_decision_guides: {
     name: 'mahakalp_sf_decision_guides',
+    tier: 'pro',
     description:
       'Search Salesforce architectural decision guides — when to use X vs Y, trade-off analysis, and implementation recommendations. Requires Sutra Pro. Powered by Mahakalp.dev',
     inputSchema: {
@@ -227,6 +234,16 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
 export function getToolDefinitions(allowedToolNames: string[]): ToolDefinition[] {
   const allowed = new Set(allowedToolNames);
   return Object.values(ALL_TOOLS).filter((t) => allowed.has(t.name));
+}
+
+/**
+ * Get tool names for a specific tier.
+ * Single source of truth for tool tier membership.
+ */
+export function getToolNamesByTier(tier: 'free' | 'pro'): string[] {
+  return Object.values(ALL_TOOLS)
+    .filter((t) => t.tier === tier)
+    .map((t) => t.name);
 }
 
 // =============================================================================
@@ -307,17 +324,9 @@ async function handleDocSearch(
   args: Record<string, unknown>,
   client: YantraClient,
 ): Promise<CallToolResult> {
-  const query = args.query as string;
-  if (!query) {
-    return {
-      content: [{ type: 'text', text: JSON.stringify({ success: false, error: 'query is required' }) }],
-      isError: true,
-    };
-  }
-
   try {
     const response = await client.searchDocs({
-      query,
+      query: args.query as string,
       releaseId: args.release_id as string | undefined,
       topics: args.topics as string[] | undefined,
       maxResults: args.max_results as number | undefined,
@@ -358,17 +367,9 @@ async function handleRules(
   args: Record<string, unknown>,
   client: YantraClient,
 ): Promise<CallToolResult> {
-  const query = args.query as string;
-  if (!query) {
-    return {
-      content: [{ type: 'text', text: JSON.stringify({ success: false, error: 'query is required' }) }],
-      isError: true,
-    };
-  }
-
   try {
     const response = await client.queryRules({
-      query,
+      query: args.query as string,
       category: args.category as string | undefined,
       severity: args.severity as string | undefined,
       context: args.context as string | undefined,
@@ -387,17 +388,9 @@ async function handlePatterns(
   args: Record<string, unknown>,
   client: YantraClient,
 ): Promise<CallToolResult> {
-  const query = args.query as string;
-  if (!query) {
-    return {
-      content: [{ type: 'text', text: JSON.stringify({ success: false, error: 'query is required' }) }],
-      isError: true,
-    };
-  }
-
   try {
     const response = await client.searchPatterns({
-      query,
+      query: args.query as string,
       category: args.category as string | undefined,
       context: args.context as string | undefined,
       maxResults: args.max_results as number | undefined,
@@ -415,17 +408,9 @@ async function handleDecisionGuides(
   args: Record<string, unknown>,
   client: YantraClient,
 ): Promise<CallToolResult> {
-  const query = args.query as string;
-  if (!query) {
-    return {
-      content: [{ type: 'text', text: JSON.stringify({ success: false, error: 'query is required' }) }],
-      isError: true,
-    };
-  }
-
   try {
     const response = await client.searchDecisionGuides({
-      query,
+      query: args.query as string,
       category: args.category as string | undefined,
       context: args.context as string | undefined,
       maxResults: args.max_results as number | undefined,

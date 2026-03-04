@@ -17,6 +17,7 @@ import type {
   Entitlement,
   EntitlementStatus,
 } from './types.js';
+import { getToolNamesByTier } from './tools.js';
 
 const DEFAULT_API_URL = 'https://yantra.mahakalp.dev';
 const DEFAULT_TIMEOUT = 10_000;
@@ -117,22 +118,11 @@ export class YantraClient {
   /**
    * Get tool access level based on entitlement.
    * Returns array of allowed tool names.
+   * Derived from tools.ts - single source of truth.
    */
   getAllowedTools(entitlement: Entitlement | null): string[] {
-    const FREE_TOOLS = [
-      'mahakalp_sf_constraints',
-      'mahakalp_sf_doc_search',
-      'mahakalp_sf_releases',
-    ];
-
-    const PRO_TOOLS = [
-      'mahakalp_sf_constraints',
-      'mahakalp_sf_doc_search',
-      'mahakalp_sf_releases',
-      'mahakalp_sf_rules',
-      'mahakalp_sf_patterns',
-      'mahakalp_sf_decision_guides',
-    ];
+    const FREE_TOOLS = getToolNamesByTier('free');
+    const PRO_TOOLS = getToolNamesByTier('pro');
 
     if (!entitlement) {
       return FREE_TOOLS;
@@ -299,6 +289,14 @@ export class YantraClient {
 
       if (!response.ok) {
         const text = await response.text().catch(() => '');
+        const status = response.status;
+        
+        const isRetryableHttpStatus = status === 429;
+        if (isRetryableHttpStatus && attempt < this.maxRetries) {
+          await this.delay(this.retryDelay * (attempt + 1));
+          return this.request<T>(path, init, attempt + 1);
+        }
+        
         const rawMessage = `Yantra API error ${response.status}: ${text || response.statusText}`;
         throw new Error(this.sanitizeError(rawMessage));
       }
