@@ -4,6 +4,8 @@ Open-source MCP server that makes any AI assistant a Salesforce expert.
 
 Governor limits, platform constraints, documentation search, and release metadata — available to Claude Code, Cursor, VS Code Copilot, and any MCP-compatible client.
 
+> **Beta Notice**: Sutra Pro is currently in beta and free to use. We'd love your feedback at [hello@mahakalp.dev](mailto:hello@mahakalp.dev).
+
 ## What it does
 
 Sutra gives your AI assistant accurate, structured Salesforce platform knowledge. Instead of hallucinating governor limits or outdated API references, your assistant queries real data curated by [Mahakalp](https://mahakalp.dev).
@@ -89,13 +91,29 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 
 ## Available tools
 
-These tools are free and require no API key:
+Sutra offers two tiers:
+
+### Free Tier (no API key required)
+
+These tools are free and require no authentication:
 
 | Tool | Description |
 |------|-------------|
 | `mahakalp_sf_constraints` | Governor limits, platform rules, and best practices with values, workarounds, and code examples |
 | `mahakalp_sf_doc_search` | Semantic search over official Salesforce documentation |
 | `mahakalp_sf_releases` | Release metadata including API versions, status, and dates |
+
+### Pro Tier (Beta - Free during beta)
+
+Pro tools require an API key (free during beta):
+
+| Tool | Description |
+|------|-------------|
+| `mahakalp_sf_rules` | Best practice rules and coding standards with severity and code examples |
+| `mahakalp_sf_patterns` | Reusable code patterns and implementation templates |
+| `mahakalp_sf_decision_guides` | Architectural decision guides and trade-off analysis |
+
+To enable Pro tools, set the `MAHAKALP_API_KEY` environment variable. See the [Setup Guide](./docs/setup.md) for details.
 
 ### Example usage
 
@@ -107,13 +125,10 @@ Once configured, your AI assistant can answer questions like:
 
 ## Roadmap
 
-Coming soon with Sutra Pro:
+Coming in future releases:
 
 | Tool | Description |
 |------|-------------|
-| Best Practice Rules | Coding standards with severity, category, and code examples |
-| Code Patterns | Reusable implementation templates — trigger, batch, integration patterns |
-| Decision Guides | Architectural decision guides — when to use X vs Y, trade-off analysis |
 | Apex Class Library | Full method signatures, parameters, return types, and governor limit implications |
 | Standard Object Schema | Standard fields, relationships, and FLS patterns |
 | LWC Component Reference | Attributes, events, wire adapters, and Apex integration patterns |
@@ -127,6 +142,20 @@ Sutra runs locally on your machine as an MCP server over stdio. When your AI ass
 ```
 Your AI assistant <--stdio--> Sutra (local) <--HTTPS--> Mahakalp API
 ```
+
+## Reliability & Degraded Mode
+
+Sutra is designed to remain functional even when external services are temporarily unavailable:
+
+- **Free tier**: Always works — no external dependencies for entitlement
+- **Pro tier**: If the entitlement service is unavailable, Sutra defaults to free tier automatically
+
+When entitlement sync fails:
+1. Server logs a warning message
+2. Falls back to free tier tools
+3. Retries entitlement refresh periodically
+
+This ensures the server continues working even during service disruptions. See [degraded-mode.md](./docs/degraded-mode.md) for detailed behavior.
 
 ## Contributing
 
