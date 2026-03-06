@@ -157,6 +157,17 @@ When entitlement sync fails:
 
 This ensures the server continues working even during service disruptions. See [degraded-mode.md](./docs/degraded-mode.md) for detailed behavior.
 
+## Beta Behavior
+
+For the definitive source of truth on free vs Pro tier behavior, entitlements, and open-source boundaries, see [beta-behavior.md](./docs/beta-behavior.md).
+
+This document covers:
+- Free vs Pro tool availability
+- Entitlement checks and statuses
+- Open source vs proprietary boundaries
+- Degraded mode behavior
+- Offline capabilities
+
 ## Contributing
 
 Contributions are welcome. Please open an issue first to discuss what you'd like to change.
