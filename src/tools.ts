@@ -38,7 +38,7 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
     name: 'mahakalp_sf_constraints',
     tier: 'free',
     description:
-      'Get Salesforce platform constraints including governor limits, platform rules, and best practices. Returns structured data with limit values, context, workarounds, and code examples. Powered by Mahakalp.dev',
+      'Get Salesforce platform constraints including governor limits, platform rules, and best practices. Returns structured data with limit values, context, workarounds, and code examples. Powered by Kognyt.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -74,7 +74,7 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
     name: 'mahakalp_sf_doc_search',
     tier: 'free',
     description:
-      'Search Salesforce official documentation using semantic search. Returns relevant documentation chunks for RAG context. Useful for answering questions about Apex, LWC, SOQL, or any Salesforce platform feature. Powered by Mahakalp.dev',
+      'Search Salesforce official documentation using semantic search. Returns relevant documentation chunks for RAG context. Useful for answering questions about Apex, LWC, SOQL, or any Salesforce platform feature. Powered by Kognyt.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -105,7 +105,7 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
     name: 'mahakalp_sf_releases',
     tier: 'free',
     description:
-      'Get information about Salesforce releases. Returns release metadata including API version, status, and release dates. Powered by Mahakalp.dev',
+      'Get information about Salesforce releases. Returns release metadata including API version, status, and release dates. Powered by Kognyt.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -134,7 +134,7 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
     name: 'mahakalp_sf_rules',
     tier: 'pro',
     description:
-      'Query Salesforce best practice rules and coding standards. Returns rules with severity, category, and code examples. Use this to validate code against platform best practices. Requires Sutra Pro. Powered by Mahakalp.dev',
+      'Query Salesforce best practice rules and coding standards. Returns rules with severity, category, and code examples. Use this to validate code against platform best practices. Requires Sutra Pro. Powered by Kognyt.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -168,7 +168,7 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
     name: 'mahakalp_sf_patterns',
     tier: 'pro',
     description:
-      'Search reusable Salesforce code patterns and implementation templates using semantic search. Returns patterns with code examples and context. Requires Sutra Pro. Powered by Mahakalp.dev',
+      'Search reusable Salesforce code patterns and implementation templates using semantic search. Returns patterns with code examples and context. Requires Sutra Pro. Powered by Kognyt.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -197,7 +197,7 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
     name: 'mahakalp_sf_decision_guides',
     tier: 'pro',
     description:
-      'Search Salesforce architectural decision guides — when to use X vs Y, trade-off analysis, and implementation recommendations. Requires Sutra Pro. Powered by Mahakalp.dev',
+      'Search Salesforce architectural decision guides — when to use X vs Y, trade-off analysis, and implementation recommendations. Requires Sutra Pro. Powered by Kognyt.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -503,7 +503,10 @@ export function validateInput(
         if (value.includes('\x00')) {
           errors.push({ field, message: `${field} contains null bytes` });
         }
-        if (/[\u0000-\u001f\u007f]/.test(value)) {
+        if ([...value].some((char) => {
+          const code = char.charCodeAt(0);
+          return code <= 0x1f || code === 0x7f;
+        })) {
           errors.push({ field, message: `${field} contains control characters` });
         }
       }

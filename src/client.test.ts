@@ -15,7 +15,7 @@ describe('YantraClient', () => {
 
   beforeEach(() => {
     mockFetch.mockClear();
-    client = new YantraClient({ apiBaseUrl: 'https://test.mahakalp.dev', apiKey: 'test-key' });
+    client = new YantraClient({ apiBaseUrl: 'https://test.kognyt.dev', apiKey: 'test-key' });
   });
 
   describe('constructor', () => {
@@ -79,7 +79,7 @@ describe('YantraClient', () => {
         maxResults: 10,
       });
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://test.mahakalp.dev/api/public/ecosystem/constraints?release_id=spring-26&constraint_type=governor_limit&max_results=10',
+        'https://test.kognyt.dev/api/public/ecosystem/constraints?release_id=spring-26&constraint_type=governor_limit&max_results=10',
         expect.any(Object)
       );
     });
@@ -102,7 +102,7 @@ describe('YantraClient', () => {
       });
       await client.searchDocs({ query: 'apex triggers' });
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://test.mahakalp.dev/api/public/ecosystem/docs/search',
+        'https://test.kognyt.dev/api/public/ecosystem/docs/search',
         expect.objectContaining({
           method: 'POST',
           body: JSON.stringify({ query: 'apex triggers', max_results: 5 }),
@@ -119,7 +119,7 @@ describe('YantraClient', () => {
       });
       await client.getReleases({ includeArchived: true, listAll: true });
       expect(mockFetch).toHaveBeenCalledWith(
-        'https://test.mahakalp.dev/api/public/ecosystem/releases?include_archived=true&list_all=true',
+        'https://test.kognyt.dev/api/public/ecosystem/releases?include_archived=true&list_all=true',
         expect.any(Object)
       );
     });
@@ -142,7 +142,7 @@ describe('YantraClient', () => {
 
   describe('API error handling', () => {
     it('throws error with status code on non-ok response when not using fallback', async () => {
-      const customClient = new YantraClient({ apiBaseUrl: 'https://test.mahakalp.dev' });
+      const customClient = new YantraClient({ apiBaseUrl: 'https://test.kognyt.dev' });
       mockFetch.mockResolvedValue({
         ok: false,
         status: 401,
@@ -159,7 +159,7 @@ describe('YantraClient', () => {
   describe('retry logic', () => {
     it('retries on transient errors', async () => {
       const retryClient = new YantraClient({
-        apiBaseUrl: 'https://test.mahakalp.dev',
+        apiBaseUrl: 'https://test.kognyt.dev',
         maxRetries: 3,
         retryDelay: 10,
       });
@@ -182,7 +182,7 @@ describe('YantraClient', () => {
 
     it('does not retry on max retries exceeded', async () => {
       const retryClient = new YantraClient({
-        apiBaseUrl: 'https://test.mahakalp.dev',
+        apiBaseUrl: 'https://test.kognyt.dev',
         maxRetries: 2,
         retryDelay: 10,
       });
@@ -195,7 +195,7 @@ describe('YantraClient', () => {
 
     it('retries on 429 Too Many Requests', async () => {
       const retryClient = new YantraClient({
-        apiBaseUrl: 'https://test.mahakalp.dev',
+        apiBaseUrl: 'https://test.kognyt.dev',
         maxRetries: 3,
         retryDelay: 10,
       });
@@ -223,7 +223,7 @@ describe('YantraClient', () => {
 
     it('retries on 500 Internal Server Error', async () => {
       const retryClient = new YantraClient({
-        apiBaseUrl: 'https://test.mahakalp.dev',
+        apiBaseUrl: 'https://test.kognyt.dev',
         maxRetries: 3,
         retryDelay: 10,
       });
@@ -251,7 +251,7 @@ describe('YantraClient', () => {
 
     it('retries on 502 Bad Gateway', async () => {
       const retryClient = new YantraClient({
-        apiBaseUrl: 'https://test.mahakalp.dev',
+        apiBaseUrl: 'https://test.kognyt.dev',
         maxRetries: 3,
         retryDelay: 10,
       });
@@ -279,7 +279,7 @@ describe('YantraClient', () => {
 
     it('retries on 503 Service Unavailable', async () => {
       const retryClient = new YantraClient({
-        apiBaseUrl: 'https://test.mahakalp.dev',
+        apiBaseUrl: 'https://test.kognyt.dev',
         maxRetries: 3,
         retryDelay: 10,
       });
@@ -307,7 +307,7 @@ describe('YantraClient', () => {
 
     it('does not retry on non-retryable HTTP errors', async () => {
       const retryClient = new YantraClient({
-        apiBaseUrl: 'https://test.mahakalp.dev',
+        apiBaseUrl: 'https://test.kognyt.dev',
         maxRetries: 3,
         retryDelay: 10,
       });
@@ -324,34 +324,22 @@ describe('YantraClient', () => {
 
     it('uses bounded exponential backoff with jitter', async () => {
       const retryClient = new YantraClient({
-        apiBaseUrl: 'https://test.mahakalp.dev',
+        apiBaseUrl: 'https://test.kognyt.dev',
         maxRetries: 3,
         retryDelay: 100,
       });
-      let callCount = 0;
+      const randomSpy = vi.spyOn(Math, 'random').mockReturnValue(0);
+      const calculateRetryDelay = (
+        retryClient as unknown as { calculateRetryDelay(attempt: number): number }
+      ).calculateRetryDelay.bind(retryClient);
 
-      mockFetch.mockImplementation(() => {
-        callCount++;
-        if (callCount < 4) {
-          return Promise.resolve({
-            ok: false,
-            status: 429,
-            statusText: 'Too Many Requests',
-            text: () => Promise.resolve(''),
-          });
-        }
-        return Promise.resolve({
-          ok: true,
-          json: () => Promise.resolve({ success: true, results: [], count: 0, query: 'test' }),
-        });
-      });
+      const delays = [0, 1, 2].map((attempt) => calculateRetryDelay(attempt));
 
-      const startTime = Date.now();
-      await retryClient.searchDocs({ query: 'test' });
-      const totalTime = Date.now() - startTime;
+      expect(delays[0]).toBe(100);
+      expect(delays[1]).toBe(200);
+      expect(delays[2]).toBe(400);
 
-      expect(callCount).toBe(4);
-      expect(totalTime).toBeGreaterThan(100);
+      randomSpy.mockRestore();
     });
   });
 

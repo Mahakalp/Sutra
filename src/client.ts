@@ -19,12 +19,12 @@ import type {
 } from './types.js';
 import { getToolNamesByTier } from './tools.js';
 
-const DEFAULT_API_URL = 'https://yantra.mahakalp.dev';
+const DEFAULT_API_URL = 'https://yantra.kognyt.dev';
 const DEFAULT_TIMEOUT = 10_000;
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_RETRY_DELAY = 1_000;
 const MAX_RETRY_DELAY = 30_000;
-const USER_AGENT = '@mahakalp/salesforce-mcp';
+const USER_AGENT = '@kognyt/salesforce-mcp';
 
 const HTTP_RETRYABLE_STATUSES = [429, 500, 502, 503];
 

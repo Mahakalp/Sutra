@@ -1,6 +1,6 @@
 # Sutra Beta Behavior — Free vs Pro
 
-> **Beta Notice**: Sutra Pro is currently in beta and free to use. We'd love your feedback at [hello@mahakalp.dev](mailto:hello@mahakalp.dev).
+> **Beta Notice**: Sutra Pro is currently in beta and free to use. We'd love your feedback at [hello@kognyt.dev](mailto:hello@kognyt.dev).
 
 This document is the **source of truth** for Sutra beta behavior. It defines free vs pro tier behavior, entitlement checks, open-source vs proprietary boundaries, and what content/backend capabilities remain proprietary. This document is sufficient for engineering, docs, and support to act without ambiguity.
 
@@ -161,7 +161,7 @@ These require Yantra API connectivity:
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
 | `MAHAKALP_API_KEY` | No | (none) | API key for Pro tier |
-| `MAHAKALP_API_URL` | No | `https://yantra.mahakalp.dev` | Yantra API base URL |
+| `MAHAKALP_API_URL` | No | `https://yantra.kognyt.dev` | Yantra API base URL |
 | `MAHAKALP_TIMEOUT` | No | `10000` | Request timeout (ms) |
 
 ---

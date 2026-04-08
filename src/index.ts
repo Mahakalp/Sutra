@@ -3,14 +3,14 @@
 /**
  * Sutra — Entry point
  *
- * @mahakalp/salesforce-mcp
+ * @kognyt/salesforce-mcp
  * Open-source MCP server that makes any AI assistant a Salesforce expert.
  *
  * Usage:
- *   npx @mahakalp/salesforce-mcp
+ *   npx -y @kognyt/salesforce-mcp
  *
  * Environment variables:
- *   MAHAKALP_API_URL  — Yantra API base URL (default: https://yantra.mahakalp.dev)
+ *   MAHAKALP_API_URL  — Yantra API base URL (default: https://yantra.kognyt.dev)
  *   MAHAKALP_API_KEY  — API key for paid tier tools (optional for free tools)
  */
 

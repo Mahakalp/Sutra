@@ -28,8 +28,8 @@ Sutra operates in degraded mode when it cannot reach the Yantra API or verify us
 **Server logs**:
 ```
 [sutra] Warning: Could not reach Yantra API. Server starting with limited functionality.
-[sutra] Mahakalp Salesforce MCP server started
-[sutra] API: https://yantra.mahakalp.dev
+[sutra] Kognyt Salesforce MCP server started
+[sutra] API: https://yantra.kognyt.dev
 [sutra] Tier: free
 [sutra] Tools: mahakalp_sf_constraints, mahakalp_sf_doc_search, mahakalp_sf_releases
 ```
@@ -47,8 +47,8 @@ Sutra operates in degraded mode when it cannot reach the Yantra API or verify us
 
 **Server logs**:
 ```
-[sutra] Mahakalp Salesforce MCP server started
-[sutra] API: https://yantra.mahakalp.dev
+[sutra] Kognyt Salesforce MCP server started
+[sutra] API: https://yantra.kognyt.dev
 [sutra] Tier: free
 [sutra] Tools: mahakalp_sf_constraints, mahakalp_sf_doc_search, mahakalp_sf_releases
 [sutra] Entitlement refresh: None (using free tier)
@@ -195,7 +195,7 @@ These tools require a valid entitlement with status `active`, `trialing`, or `ca
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `MAHAKALP_API_URL` | Yantra API base URL | `https://yantra.mahakalp.dev` |
+| `MAHAKALP_API_URL` | Yantra API base URL | `https://yantra.kognyt.dev` |
 | `MAHAKALP_API_KEY` | API key for Pro tier | (none) |
 
 ### Refresh Intervals

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { readFile } from 'fs/promises';
+import { URL } from 'url';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
@@ -12,12 +13,12 @@ import type { Entitlement, SutraConfig } from './types.js';
 describe('integration', () => {
   describe('Node runtime compatibility', () => {
     it('dist/index.js is valid ESM', async () => {
-      const indexJs = await readFile('/home/nishantg/Projects/Mahakalp/Sutra/dist/index.js', 'utf-8');
+      const indexJs = await readFile(new URL('../dist/index.js', import.meta.url), 'utf-8');
       expect(indexJs).toContain('startServer');
     });
 
     it('dist/server.d.ts exports startServer', async () => {
-      const serverDts = await readFile('/home/nishantg/Projects/Mahakalp/Sutra/dist/server.d.ts', 'utf-8');
+      const serverDts = await readFile(new URL('../dist/server.d.ts', import.meta.url), 'utf-8');
       expect(serverDts).toContain('startServer');
     });
   });
@@ -149,7 +150,7 @@ describe('integration', () => {
 
     it('server reports correct version', () => {
       const server = new Server(
-        { name: '@mahakalp/salesforce-mcp', version: '0.2.0' },
+        { name: '@kognyt/salesforce-mcp', version: '0.2.0' },
         { capabilities: { tools: {} } }
       );
       expect(server).toBeDefined();

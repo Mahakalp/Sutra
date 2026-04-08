@@ -393,7 +393,7 @@ interface SutraConfig {
   "packs": {
     "free.constraints.v1.2.0": {
       "version": "1.2.0",
-      "download_url": "https://cdn.mahakalp.dev/packs/free.constraints.v1.2.0.tar.zst",
+      "download_url": "https://cdn.kognyt.dev/packs/free.constraints.v1.2.0.tar.zst",
       "content_hash": "sha256:def456...",
       "signature": "ed25519:xyz789..."
     }

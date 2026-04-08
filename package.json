@@ -1,11 +1,11 @@
 {
-  "name": "@mahakalp/salesforce-mcp",
+  "name": "@kognyt/salesforce-mcp",
   "version": "0.2.0",
   "description": "Open-source MCP server that makes any AI assistant a Salesforce expert",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "mahakalp-sf-mcp": "dist/index.js"
+    "salesforce-mcp": "dist/index.js"
   },
   "scripts": {
     "build": "tsc",
@@ -30,13 +30,13 @@
     "cursor",
     "copilot"
   ],
-  "author": "Mahakalp <hello@mahakalp.dev>",
+  "author": "Kognyt <hello@kognyt.dev>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Mahakalp/Sutra.git"
+    "url": "git+https://github.com/Mahakalp/Sutra.git"
   },
-  "homepage": "https://mahakalp.dev",
+  "homepage": "https://kognyt.dev",
   "bugs": {
     "url": "https://github.com/Mahakalp/Sutra/issues"
   },
@@ -48,6 +48,9 @@
     "LICENSE",
     "README.md"
   ],
+  "publishConfig": {
+    "access": "public"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1"
   },

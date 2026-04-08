@@ -1,14 +1,14 @@
-# @mahakalp/salesforce-mcp
+# @kognyt/salesforce-mcp
 
 Open-source MCP server that makes any AI assistant a Salesforce expert.
 
 Governor limits, platform constraints, documentation search, and release metadata — available to Claude Code, Cursor, VS Code Copilot, and any MCP-compatible client.
 
-> **Beta Notice**: Sutra Pro is currently in beta and free to use. We'd love your feedback at [hello@mahakalp.dev](mailto:hello@mahakalp.dev).
+> **Beta Notice**: Sutra Pro is currently in beta and free to use. We'd love your feedback at [hello@kognyt.dev](mailto:hello@kognyt.dev).
 
 ## What it does
 
-Sutra gives your AI assistant accurate, structured Salesforce platform knowledge. Instead of hallucinating governor limits or outdated API references, your assistant queries real data curated by [Mahakalp](https://mahakalp.dev).
+Sutra gives your AI assistant accurate, structured Salesforce platform knowledge. Instead of hallucinating governor limits or outdated API references, your assistant queries real data curated by [Kognyt](https://kognyt.dev).
 
 No Salesforce org connection required. No authentication needed for free tools.
 
@@ -18,10 +18,10 @@ No Salesforce org connection required. No authentication needed for free tools.
 
 ```bash
 # Run directly without installing
-npx @mahakalp/salesforce-mcp
+npx -y @kognyt/salesforce-mcp
 
 # Or install globally
-npm install -g @mahakalp/salesforce-mcp
+npm install -g @kognyt/salesforce-mcp
 ```
 
 ### From source
@@ -41,7 +41,7 @@ Add the server to your AI tool's MCP configuration:
 ### Claude Code
 
 ```bash
-claude mcp add salesforce-mcp -- npx @mahakalp/salesforce-mcp
+claude mcp add salesforce-mcp -- npx -y @kognyt/salesforce-mcp
 ```
 
 ### Cursor
@@ -53,7 +53,7 @@ Add to `.cursor/mcp.json`:
   "mcpServers": {
     "salesforce-mcp": {
       "command": "npx",
-      "args": ["@mahakalp/salesforce-mcp"]
+      "args": ["-y", "@kognyt/salesforce-mcp"]
     }
   }
 }
@@ -68,7 +68,7 @@ Add to `.vscode/mcp.json`:
   "servers": {
     "salesforce-mcp": {
       "command": "npx",
-      "args": ["@mahakalp/salesforce-mcp"]
+      "args": ["-y", "@kognyt/salesforce-mcp"]
     }
   }
 }
@@ -83,7 +83,7 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
   "mcpServers": {
     "salesforce-mcp": {
       "command": "npx",
-      "args": ["@mahakalp/salesforce-mcp"]
+      "args": ["-y", "@kognyt/salesforce-mcp"]
     }
   }
 }
@@ -137,10 +137,10 @@ Coming in future releases:
 
 ## How it works
 
-Sutra runs locally on your machine as an MCP server over stdio. When your AI assistant calls a tool, Sutra sends a request to the Mahakalp API, which returns curated Salesforce platform knowledge. No code, schema, or org data ever leaves your machine — Sutra only fetches public platform knowledge.
+Sutra runs locally on your machine as an MCP server over stdio. When your AI assistant calls a tool, Sutra sends a request to the Kognyt API, which returns curated Salesforce platform knowledge. No code, schema, or org data ever leaves your machine — Sutra only fetches public platform knowledge.
 
 ```
-Your AI assistant <--stdio--> Sutra (local) <--HTTPS--> Mahakalp API
+Your AI assistant <--stdio--> Sutra (local) <--HTTPS--> Kognyt API
 ```
 
 ## Reliability & Degraded Mode

@@ -3,17 +3,26 @@ import { getToolDefinitions, handleToolCall, validateInput } from './tools.js';
 import type { Entitlement } from './types.js';
 import type { YantraClient } from './client.js';
 
-vi.mock('./client.js', () => ({
-  YantraClient: class {
-    constructor() {}
-    healthCheck() { return Promise.resolve(true); }
-    getEntitlement() { return Promise.resolve(null); }
-    getAllowedTools(e: Entitlement | null) { 
-      if (!e) return ['mahakalp_sf_constraints'];
-      return ['mahakalp_sf_constraints', 'mahakalp_sf_doc_search', 'mahakalp_sf_releases', 'mahakalp_sf_rules', 'mahakalp_sf_patterns', 'mahakalp_sf_decision_guides'];
-    }
-  },
-}));
+function createMockClient(overrides: Partial<YantraClient> = {}): YantraClient {
+  return {
+    healthCheck: vi.fn().mockResolvedValue(true),
+    getEntitlement: vi.fn().mockResolvedValue(null),
+    getAllowedTools: vi.fn((entitlement: Entitlement | null) => {
+      if (!entitlement) {
+        return ['mahakalp_sf_constraints'];
+      }
+      return [
+        'mahakalp_sf_constraints',
+        'mahakalp_sf_doc_search',
+        'mahakalp_sf_releases',
+        'mahakalp_sf_rules',
+        'mahakalp_sf_patterns',
+        'mahakalp_sf_decision_guides',
+      ];
+    }),
+    ...overrides,
+  } as unknown as YantraClient;
+}
 
 describe('server', () => {
   describe('getToolDefinitions', () => {
@@ -64,15 +73,13 @@ describe('server', () => {
 
   describe('entitlement refresh', () => {
     it('client fetches entitlement', async () => {
-      const { YantraClient } = await import('./client.js');
-      const client = new YantraClient({ apiBaseUrl: 'https://test.api' });
+      const client = createMockClient();
       const entitlement = await client.getEntitlement();
-      expect(entitlement).toBeDefined();
+      expect(entitlement).toBeNull();
     });
 
     it('client allows pro tools when entitlement is active', async () => {
-      const { YantraClient } = await import('./client.js');
-      const client = new YantraClient({ apiBaseUrl: 'https://test.api' });
+      const client = createMockClient();
       const entitlement: Entitlement = {
         sub_id: 'sub_test',
         org_id: 'org_test',
@@ -87,8 +94,7 @@ describe('server', () => {
     });
 
     it('client returns only free tools for null entitlement', async () => {
-      const { YantraClient } = await import('./client.js');
-      const client = new YantraClient({ apiBaseUrl: 'https://test.api' });
+      const client = createMockClient();
       const allowedTools = client.getAllowedTools(null);
       expect(allowedTools).not.toContain('mahakalp_sf_rules');
     });
@@ -135,10 +141,8 @@ describe('server', () => {
     });
 
     it('preserves last known good entitlement on transient API failure', async () => {
-      const { YantraClient } = await import('./client.js');
-      
       let callCount = 0;
-      const mockClient = new YantraClient({ apiBaseUrl: 'https://test.api' });
+      const mockClient = createMockClient();
       
       vi.spyOn(mockClient, 'getEntitlement').mockImplementation(async () => {
         callCount++;
@@ -168,9 +172,7 @@ describe('server', () => {
     });
 
     it('uses last known good entitlement when API returns null but not stale', async () => {
-      const { YantraClient } = await import('./client.js');
-      
-      const mockClient = new YantraClient({ apiBaseUrl: 'https://test.api' });
+      const mockClient = createMockClient();
       const proEntitlement = createMockEntitlement();
       
       vi.spyOn(mockClient, 'getEntitlement')
@@ -195,9 +197,7 @@ describe('server', () => {
     });
 
     it('uses last known good when stale threshold exceeded but entitlement exists', async () => {
-      const { YantraClient } = await import('./client.js');
-      
-      const mockClient = new YantraClient({ apiBaseUrl: 'https://test.api' });
+      const mockClient = createMockClient();
       const proEntitlement = createMockEntitlement();
       
       vi.spyOn(mockClient, 'getEntitlement')
@@ -224,9 +224,7 @@ describe('server', () => {
     });
 
     it('falls back to free tier when no cached entitlement and API fails', async () => {
-      const { YantraClient } = await import('./client.js');
-      
-      const mockClient = new YantraClient({ apiBaseUrl: 'https://test.api' });
+      const mockClient = createMockClient();
       
       vi.spyOn(mockClient, 'getEntitlement').mockRejectedValue(new Error('Network error'));
       vi.spyOn(mockClient, 'getAllowedTools').mockImplementation((entitlement) => {
@@ -250,9 +248,7 @@ describe('server', () => {
     });
 
     it('does not downgrade to free tier on API blip when entitlement was pro', async () => {
-      const { YantraClient } = await import('./client.js');
-      
-      const mockClient = new YantraClient({ apiBaseUrl: 'https://test.api' });
+      const mockClient = createMockClient();
       const proEntitlement = createMockEntitlement({ status: 'active' });
       
       vi.spyOn(mockClient, 'getEntitlement')

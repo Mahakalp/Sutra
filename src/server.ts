@@ -52,7 +52,7 @@ export async function startServer(config: Partial<SutraConfig> = {}): Promise<vo
   await refreshEntitlement(client, serverState);
 
   const server = new Server(
-    { name: '@mahakalp/salesforce-mcp', version: '0.2.0' },
+    { name: '@kognyt/salesforce-mcp', version: '0.2.0' },
     { capabilities: { tools: {} } }
   );
 
@@ -95,8 +95,8 @@ export async function startServer(config: Partial<SutraConfig> = {}): Promise<vo
   }, refreshInterval);
 
   const tierLabel = serverState.entitlement ? `${serverState.entitlement.tier} (${serverState.entitlement.status})` : 'free';
-  log('Mahakalp Salesforce MCP server started');
-  log(`API: ${config.apiBaseUrl ?? 'https://yantra.mahakalp.dev'}`);
+  log('Kognyt Salesforce MCP server started');
+  log(`API: ${config.apiBaseUrl ?? 'https://yantra.kognyt.dev'}`);
   log(`Tier: ${tierLabel}`);
   log(`Tools: ${serverState.toolDefs.map((t) => t.name).join(', ')}`);
   log(`Entitlement refresh interval: ${refreshInterval}ms`);

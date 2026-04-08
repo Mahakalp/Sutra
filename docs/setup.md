@@ -7,7 +7,7 @@ Sutra is an MCP server that provides Salesforce platform knowledge to AI assista
 Sutra Pro is currently in **beta**. During this period:
 - All Pro tools are available at no cost
 - Feature set may evolve based on feedback
-- We'd love your feedback at [hello@mahakalp.dev](mailto:hello@mahakalp.dev)
+- We'd love your feedback at [hello@kognyt.dev](mailto:hello@kognyt.dev)
 
 ## Prerequisites
 
@@ -20,13 +20,13 @@ Sutra Pro is currently in **beta**. During this period:
 ### Option 1: Using npx (recommended for quick setup)
 
 ```bash
-npx @mahakalp/salesforce-mcp
+npx -y @kognyt/salesforce-mcp
 ```
 
 ### Option 2: Install globally with npm
 
 ```bash
-npm install -g @mahakalp/salesforce-mcp
+npm install -g @kognyt/salesforce-mcp
 ```
 
 ### Option 3: Build from source
@@ -67,7 +67,7 @@ $env:MAHAKALP_API_KEY="your-api-key"
 Or pass it directly in your MCP configuration:
 
 ```bash
-claude mcp add salesforce-mcp -- npx @mahakalp/salesforce-mcp --env MAHAKALP_API_KEY=your-api-key
+claude mcp add salesforce-mcp -- npx -y @kognyt/salesforce-mcp --env MAHAKALP_API_KEY=your-api-key
 ```
 
 **Pro tools include:**
@@ -91,13 +91,13 @@ export MAHAKALP_API_URL="https://your-yantra-instance.com"
 ### Claude Code
 
 ```bash
-claude mcp add salesforce-mcp -- npx @mahakalp/salesforce-mcp
+claude mcp add salesforce-mcp -- npx -y @kognyt/salesforce-mcp
 ```
 
 For Pro tools:
 
 ```bash
-claude mcp add salesforce-mcp -- npx @mahakalp/salesforce-mcp --env MAHAKALP_API_KEY=your-api-key
+claude mcp add salesforce-mcp -- npx -y @kognyt/salesforce-mcp --env MAHAKALP_API_KEY=your-api-key
 ```
 
 ### Cursor
@@ -109,7 +109,7 @@ Create or edit `.cursor/mcp.json`:
   "mcpServers": {
     "salesforce-mcp": {
       "command": "npx",
-      "args": ["@mahakalp/salesforce-mcp"]
+      "args": ["-y", "@kognyt/salesforce-mcp"]
     }
   }
 }
@@ -122,7 +122,7 @@ For Pro tools with API key, use a wrapper script:
 cat > ~/sutra-mcp.sh << 'EOF'
 #!/bin/bash
 export MAHAKALP_API_KEY="your-api-key"
-exec npx @mahakalp/salesforce-mcp "$@"
+exec npx -y @kognyt/salesforce-mcp "$@"
 EOF
 chmod +x ~/sutra-mcp.sh
 ```
@@ -148,7 +148,7 @@ Create or edit `.vscode/mcp.json`:
   "servers": {
     "salesforce-mcp": {
       "command": "npx",
-      "args": ["@mahakalp/salesforce-mcp"]
+      "args": ["-y", "@kognyt/salesforce-mcp"]
     }
   }
 }
@@ -163,7 +163,7 @@ Edit `~/.codeium/windsurf/mcp_config.json`:
   "mcpServers": {
     "salesforce-mcp": {
       "command": "npx",
-      "args": ["@mahakalp/salesforce-mcp"]
+      "args": ["-y", "@kognyt/salesforce-mcp"]
     }
   }
 }

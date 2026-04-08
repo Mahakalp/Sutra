@@ -81,7 +81,7 @@ All backend infrastructure is proprietary:
 
 | Service | Purpose |
 |---------|---------|
-| **Yantra API** | REST API serving tool responses (`yantra.mahakalp.dev`) |
+| **Yantra API** | REST API serving tool responses (`yantra.kognyt.dev`) |
 | **Entitlement Service** | Subscription verification via Firebase claims |
 | **Content Management** | Curation system for knowledge base updates |
 | **Vector Database** | Semantic search infrastructure for documentation |
@@ -172,7 +172,7 @@ The subscription and access control system is proprietary:
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `MAHAKALP_API_URL` | No | Custom Yantra API URL (default: `https://yantra.mahakalp.dev`) |
+| `MAHAKALP_API_URL` | No | Custom Yantra API URL (default: `https://yantra.kognyt.dev`) |
 | `MAHAKALP_API_KEY` | No | API key for Pro tier access |
 | `MAHAKALP_TIMEOUT` | No | Request timeout in ms (default: 10000) |
 
