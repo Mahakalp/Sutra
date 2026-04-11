@@ -99,9 +99,9 @@ These tools are free and require no authentication:
 
 | Tool | Description |
 |------|-------------|
-| `mahakalp_sf_constraints` | Governor limits, platform rules, and best practices with values, workarounds, and code examples |
-| `mahakalp_sf_doc_search` | Semantic search over official Salesforce documentation |
-| `mahakalp_sf_releases` | Release metadata including API versions, status, and dates |
+| `kognyt_sf_constraints` | Governor limits, platform rules, and best practices with values, workarounds, and code examples |
+| `kognyt_sf_doc_search` | Semantic search over official Salesforce documentation |
+| `kognyt_sf_releases` | Release metadata including API versions, status, and dates |
 
 ### Pro Tier (Beta - Free during beta)
 
@@ -109,9 +109,9 @@ Pro tools require an API key (free during beta):
 
 | Tool | Description |
 |------|-------------|
-| `mahakalp_sf_rules` | Best practice rules and coding standards with severity and code examples |
-| `mahakalp_sf_patterns` | Reusable code patterns and implementation templates |
-| `mahakalp_sf_decision_guides` | Architectural decision guides and trade-off analysis |
+| `kognyt_sf_rules` | Best practice rules and coding standards with severity and code examples |
+| `kognyt_sf_patterns` | Reusable code patterns and implementation templates |
+| `kognyt_sf_decision_guides` | Architectural decision guides and trade-off analysis |
 
 To enable Pro tools, set the `KOGNYT_API_KEY` environment variable. See the [Setup Guide](./docs/setup.md) for details.
 

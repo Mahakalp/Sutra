@@ -31,7 +31,7 @@ Sutra operates in degraded mode when it cannot reach the Yantra API or verify us
 [sutra] Kognyt Salesforce MCP server started
 [sutra] API: https://yantra.kognyt.dev
 [sutra] Tier: free
-[sutra] Tools: mahakalp_sf_constraints, mahakalp_sf_doc_search, mahakalp_sf_releases
+[sutra] Tools: kognyt_sf_constraints, kognyt_sf_doc_search, kognyt_sf_releases
 ```
 
 ---
@@ -50,7 +50,7 @@ Sutra operates in degraded mode when it cannot reach the Yantra API or verify us
 [sutra] Kognyt Salesforce MCP server started
 [sutra] API: https://yantra.kognyt.dev
 [sutra] Tier: free
-[sutra] Tools: mahakalp_sf_constraints, mahakalp_sf_doc_search, mahakalp_sf_releases
+[sutra] Tools: kognyt_sf_constraints, kognyt_sf_doc_search, kognyt_sf_releases
 [sutra] Entitlement refresh: None (using free tier)
 ```
 
@@ -164,9 +164,9 @@ if (graceStates.includes(entitlement.status)) {
 
 These tools are built into Sutra and available even when API is unreachable:
 
-1. `mahakalp_sf_constraints` - Governor limits, platform rules, best practices
-2. `mahakalp_sf_doc_search` - Salesforce documentation semantic search
-3. `mahakalp_sf_releases` - Release metadata
+1. `kognyt_sf_constraints` - Governor limits, platform rules, best practices
+2. `kognyt_sf_doc_search` - Salesforce documentation semantic search
+3. `kognyt_sf_releases` - Release metadata
 
 ---
 
@@ -174,9 +174,9 @@ These tools are built into Sutra and available even when API is unreachable:
 
 These tools require a valid entitlement with status `active`, `trialing`, or `canceled` (within grace period):
 
-1. `mahakalp_sf_rules` - Best practice rules and coding standards
-2. `mahakalp_sf_patterns` - Reusable code patterns and templates
-3. `mahakalp_sf_decision_guides` - Architectural decision guides
+1. `kognyt_sf_rules` - Best practice rules and coding standards
+2. `kognyt_sf_patterns` - Reusable code patterns and templates
+3. `kognyt_sf_decision_guides` - Architectural decision guides
 
 ---
 

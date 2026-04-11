@@ -51,13 +51,13 @@ describe('YantraClient', () => {
     it('returns tier info on success', async () => {
       const tierResponse = {
         tier: 'pro',
-        tools: ['mahakalp_sf_constraints', 'mahakalp_sf_rules'],
+        tools: ['kognyt_sf_constraints', 'kognyt_sf_rules'],
         limits: { requests_per_day: 1000 },
       };
       mockFetch.mockResolvedValue({ ok: true, json: () => Promise.resolve(tierResponse) });
       const result = await client.getTier();
       expect(result.tier).toBe('pro');
-      expect(result.tools).toContain('mahakalp_sf_rules');
+      expect(result.tools).toContain('kognyt_sf_rules');
     });
 
     it('anti-drift: fallback tools match canonical getToolNamesByTier', async () => {

@@ -28,7 +28,7 @@ describe('integration', () => {
       const mockClient = {
         healthCheck: vi.fn().mockResolvedValue(true),
         getEntitlement: vi.fn().mockResolvedValue(null),
-        getAllowedTools: vi.fn().mockReturnValue(['mahakalp_sf_constraints']),
+        getAllowedTools: vi.fn().mockReturnValue(['kognyt_sf_constraints']),
       } as unknown as YantraClient;
 
       const config: Partial<SutraConfig> = {
@@ -54,7 +54,7 @@ describe('integration', () => {
       const mockClient = {
         healthCheck: vi.fn().mockResolvedValue(true),
         getEntitlement: vi.fn().mockResolvedValue(null),
-        getAllowedTools: vi.fn().mockReturnValue(['mahakalp_sf_constraints']),
+        getAllowedTools: vi.fn().mockReturnValue(['kognyt_sf_constraints']),
       } as unknown as YantraClient;
 
       const serverState = {
@@ -68,7 +68,7 @@ describe('integration', () => {
       await refreshEntitlement(mockClient, serverState);
 
       expect(serverState.entitlement).toBeNull();
-      expect(Array.from(serverState.allowedToolNames)).toContain('mahakalp_sf_constraints');
+      expect(Array.from(serverState.allowedToolNames)).toContain('kognyt_sf_constraints');
     });
 
     it('initializes with pro entitlement', async () => {
@@ -86,12 +86,12 @@ describe('integration', () => {
         healthCheck: vi.fn().mockResolvedValue(true),
         getEntitlement: vi.fn().mockResolvedValue(proEntitlement),
         getAllowedTools: vi.fn().mockReturnValue([
-          'mahakalp_sf_constraints',
-          'mahakalp_sf_doc_search',
-          'mahakalp_sf_releases',
-          'mahakalp_sf_rules',
-          'mahakalp_sf_patterns',
-          'mahakalp_sf_decision_guides',
+          'kognyt_sf_constraints',
+          'kognyt_sf_doc_search',
+          'kognyt_sf_releases',
+          'kognyt_sf_rules',
+          'kognyt_sf_patterns',
+          'kognyt_sf_decision_guides',
         ]),
       } as unknown as YantraClient;
 
@@ -106,7 +106,7 @@ describe('integration', () => {
       await refreshEntitlement(mockClient, serverState);
 
       expect(serverState.entitlement?.tier).toBe('pro');
-      expect(Array.from(serverState.allowedToolNames)).toContain('mahakalp_sf_rules');
+      expect(Array.from(serverState.allowedToolNames)).toContain('kognyt_sf_rules');
     });
   });
 
@@ -136,13 +136,13 @@ describe('integration', () => {
 
       server.setRequestHandler(ListToolsRequestSchema, async () => {
         return {
-          tools: getToolDefinitions(['mahakalp_sf_constraints']),
+          tools: getToolDefinitions(['kognyt_sf_constraints']),
         };
       });
 
       server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const { name, arguments: args } = request.params;
-        return handleToolCall(name, (args ?? {}) as Record<string, unknown>, mockClient, new Set(['mahakalp_sf_constraints']));
+        return handleToolCall(name, (args ?? {}) as Record<string, unknown>, mockClient, new Set(['kognyt_sf_constraints']));
       });
 
       expect(server).toBeDefined();
@@ -169,12 +169,12 @@ describe('integration', () => {
       );
 
       server.setRequestHandler(ListToolsRequestSchema, async () => {
-        return { tools: getToolDefinitions(['mahakalp_sf_constraints']) };
+        return { tools: getToolDefinitions(['kognyt_sf_constraints']) };
       });
 
       server.setRequestHandler(CallToolRequestSchema, async (request) => {
         const { name, arguments: args } = request.params;
-        return handleToolCall(name, (args ?? {}) as Record<string, unknown>, mockClient, new Set(['mahakalp_sf_constraints']));
+        return handleToolCall(name, (args ?? {}) as Record<string, unknown>, mockClient, new Set(['kognyt_sf_constraints']));
       });
 
       expect(server).toBeDefined();
@@ -182,7 +182,7 @@ describe('integration', () => {
 
     it('validates tool name format', async () => {
       const mockClient = {} as YantraClient;
-      const allowedTools = new Set(['mahakalp_sf_constraints']);
+      const allowedTools = new Set(['kognyt_sf_constraints']);
 
       const result = await handleToolCall('invalid_tool_name', {}, mockClient, allowedTools);
       expect(result).toBeNull();
@@ -190,17 +190,17 @@ describe('integration', () => {
 
     it('rejects tool call with missing required params', async () => {
       const mockClient = {} as YantraClient;
-      const allowedTools = new Set(['mahakalp_sf_doc_search']);
+      const allowedTools = new Set(['kognyt_sf_doc_search']);
 
-      const result = await handleToolCall('mahakalp_sf_doc_search', {}, mockClient, allowedTools);
+      const result = await handleToolCall('kognyt_sf_doc_search', {}, mockClient, allowedTools);
       expect(result?.isError).toBe(true);
     });
 
     it('returns error for disallowed tool even with valid params', async () => {
       const mockClient = {} as YantraClient;
-      const allowedTools = new Set(['mahakalp_sf_constraints']);
+      const allowedTools = new Set(['kognyt_sf_constraints']);
 
-      const result = await handleToolCall('mahakalp_sf_rules', { query: 'security' }, mockClient, allowedTools);
+      const result = await handleToolCall('kognyt_sf_rules', { query: 'security' }, mockClient, allowedTools);
       expect(result).toBeNull();
     });
   });
@@ -224,14 +224,14 @@ describe('integration', () => {
           .mockResolvedValueOnce(null)
           .mockResolvedValueOnce(createMockEntitlement({ status: 'active' })),
         getAllowedTools: vi.fn()
-          .mockReturnValueOnce(['mahakalp_sf_constraints'])
+          .mockReturnValueOnce(['kognyt_sf_constraints'])
           .mockReturnValueOnce([
-            'mahakalp_sf_constraints',
-            'mahakalp_sf_doc_search',
-            'mahakalp_sf_releases',
-            'mahakalp_sf_rules',
-            'mahakalp_sf_patterns',
-            'mahakalp_sf_decision_guides',
+            'kognyt_sf_constraints',
+            'kognyt_sf_doc_search',
+            'kognyt_sf_releases',
+            'kognyt_sf_rules',
+            'kognyt_sf_patterns',
+            'kognyt_sf_decision_guides',
           ]),
       } as unknown as YantraClient;
 
@@ -245,11 +245,11 @@ describe('integration', () => {
 
       await refreshEntitlement(mockClient, serverState, 600000);
       const freeTools = Array.from(serverState.allowedToolNames);
-      expect(freeTools).not.toContain('mahakalp_sf_rules');
+      expect(freeTools).not.toContain('kognyt_sf_rules');
 
       await refreshEntitlement(mockClient, serverState, 600000);
       const proTools = Array.from(serverState.allowedToolNames);
-      expect(proTools).toContain('mahakalp_sf_rules');
+      expect(proTools).toContain('kognyt_sf_rules');
     });
 
     it('transitions from pro to free when entitlement is revoked', async () => {
@@ -260,14 +260,14 @@ describe('integration', () => {
           .mockResolvedValueOnce(null),
         getAllowedTools: vi.fn()
           .mockReturnValueOnce([
-            'mahakalp_sf_constraints',
-            'mahakalp_sf_doc_search',
-            'mahakalp_sf_releases',
-            'mahakalp_sf_rules',
-            'mahakalp_sf_patterns',
-            'mahakalp_sf_decision_guides',
+            'kognyt_sf_constraints',
+            'kognyt_sf_doc_search',
+            'kognyt_sf_releases',
+            'kognyt_sf_rules',
+            'kognyt_sf_patterns',
+            'kognyt_sf_decision_guides',
           ])
-          .mockReturnValueOnce(['mahakalp_sf_constraints']),
+          .mockReturnValueOnce(['kognyt_sf_constraints']),
       } as unknown as YantraClient;
 
       const serverState = {
@@ -280,13 +280,13 @@ describe('integration', () => {
 
       await refreshEntitlement(mockClient, serverState, 600000);
       const proTools = Array.from(serverState.allowedToolNames);
-      expect(proTools).toContain('mahakalp_sf_rules');
+      expect(proTools).toContain('kognyt_sf_rules');
 
       serverState.lastRefreshTimestamp = Date.now() - 700000;
 
       await refreshEntitlement(mockClient, serverState, 600000);
       const freeTools = Array.from(serverState.allowedToolNames);
-      expect(freeTools).not.toContain('mahakalp_sf_rules');
+      expect(freeTools).not.toContain('kognyt_sf_rules');
     });
 
     it('blocks pro tools when entitlement status changes to past_due', async () => {
@@ -297,14 +297,14 @@ describe('integration', () => {
           .mockResolvedValueOnce(createMockEntitlement({ status: 'past_due' })),
         getAllowedTools: vi.fn()
           .mockReturnValueOnce([
-            'mahakalp_sf_constraints',
-            'mahakalp_sf_doc_search',
-            'mahakalp_sf_releases',
-            'mahakalp_sf_rules',
-            'mahakalp_sf_patterns',
-            'mahakalp_sf_decision_guides',
+            'kognyt_sf_constraints',
+            'kognyt_sf_doc_search',
+            'kognyt_sf_releases',
+            'kognyt_sf_rules',
+            'kognyt_sf_patterns',
+            'kognyt_sf_decision_guides',
           ])
-          .mockReturnValueOnce(['mahakalp_sf_constraints']),
+          .mockReturnValueOnce(['kognyt_sf_constraints']),
       } as unknown as YantraClient;
 
       const serverState = {
@@ -317,11 +317,11 @@ describe('integration', () => {
 
       await refreshEntitlement(mockClient, serverState, 600000);
       expect(serverState.entitlement?.status).toBe('active');
-      expect(Array.from(serverState.allowedToolNames)).toContain('mahakalp_sf_rules');
+      expect(Array.from(serverState.allowedToolNames)).toContain('kognyt_sf_rules');
 
       await refreshEntitlement(mockClient, serverState, 600000);
       expect(serverState.entitlement?.status).toBe('past_due');
-      expect(Array.from(serverState.allowedToolNames)).not.toContain('mahakalp_sf_rules');
+      expect(Array.from(serverState.allowedToolNames)).not.toContain('kognyt_sf_rules');
     });
 
     it('maintains pro access during canceled status within grace period', async () => {
@@ -333,20 +333,20 @@ describe('integration', () => {
           .mockResolvedValueOnce(createMockEntitlement({ status: 'canceled', expires_at: futureExpiry })),
         getAllowedTools: vi.fn()
           .mockReturnValueOnce([
-            'mahakalp_sf_constraints',
-            'mahakalp_sf_doc_search',
-            'mahakalp_sf_releases',
-            'mahakalp_sf_rules',
-            'mahakalp_sf_patterns',
-            'mahakalp_sf_decision_guides',
+            'kognyt_sf_constraints',
+            'kognyt_sf_doc_search',
+            'kognyt_sf_releases',
+            'kognyt_sf_rules',
+            'kognyt_sf_patterns',
+            'kognyt_sf_decision_guides',
           ])
           .mockReturnValueOnce([
-            'mahakalp_sf_constraints',
-            'mahakalp_sf_doc_search',
-            'mahakalp_sf_releases',
-            'mahakalp_sf_rules',
-            'mahakalp_sf_patterns',
-            'mahakalp_sf_decision_guides',
+            'kognyt_sf_constraints',
+            'kognyt_sf_doc_search',
+            'kognyt_sf_releases',
+            'kognyt_sf_rules',
+            'kognyt_sf_patterns',
+            'kognyt_sf_decision_guides',
           ]),
       } as unknown as YantraClient;
 
@@ -363,7 +363,7 @@ describe('integration', () => {
 
       await refreshEntitlement(mockClient, serverState, 600000);
       expect(serverState.entitlement?.status).toBe('canceled');
-      expect(Array.from(serverState.allowedToolNames)).toContain('mahakalp_sf_rules');
+      expect(Array.from(serverState.allowedToolNames)).toContain('kognyt_sf_rules');
     });
 
     it('drops pro access when canceled status grace period expires', async () => {
@@ -373,7 +373,7 @@ describe('integration', () => {
         getEntitlement: vi.fn()
           .mockResolvedValueOnce(createMockEntitlement({ status: 'canceled', expires_at: pastExpiry })),
         getAllowedTools: vi.fn()
-          .mockReturnValueOnce(['mahakalp_sf_constraints']),
+          .mockReturnValueOnce(['kognyt_sf_constraints']),
       } as unknown as YantraClient;
 
       const serverState = {
@@ -386,7 +386,7 @@ describe('integration', () => {
 
       await refreshEntitlement(mockClient, serverState, 600000);
       expect(serverState.entitlement?.status).toBe('canceled');
-      expect(Array.from(serverState.allowedToolNames)).not.toContain('mahakalp_sf_rules');
+      expect(Array.from(serverState.allowedToolNames)).not.toContain('kognyt_sf_rules');
     });
 
     it('handles trialing status as valid pro access', async () => {
@@ -396,12 +396,12 @@ describe('integration', () => {
           .mockResolvedValueOnce(createMockEntitlement({ status: 'trialing' })),
         getAllowedTools: vi.fn()
           .mockReturnValueOnce([
-            'mahakalp_sf_constraints',
-            'mahakalp_sf_doc_search',
-            'mahakalp_sf_releases',
-            'mahakalp_sf_rules',
-            'mahakalp_sf_patterns',
-            'mahakalp_sf_decision_guides',
+            'kognyt_sf_constraints',
+            'kognyt_sf_doc_search',
+            'kognyt_sf_releases',
+            'kognyt_sf_rules',
+            'kognyt_sf_patterns',
+            'kognyt_sf_decision_guides',
           ]),
       } as unknown as YantraClient;
 
@@ -415,7 +415,7 @@ describe('integration', () => {
 
       await refreshEntitlement(mockClient, serverState, 600000);
       expect(serverState.entitlement?.status).toBe('trialing');
-      expect(Array.from(serverState.allowedToolNames)).toContain('mahakalp_sf_rules');
+      expect(Array.from(serverState.allowedToolNames)).toContain('kognyt_sf_rules');
     });
 
     it('updates tool definitions when entitlement changes', async () => {
@@ -426,14 +426,14 @@ describe('integration', () => {
           .mockResolvedValueOnce(createMockEntitlement({ status: 'past_due' })),
         getAllowedTools: vi.fn()
           .mockReturnValueOnce([
-            'mahakalp_sf_constraints',
-            'mahakalp_sf_doc_search',
-            'mahakalp_sf_releases',
-            'mahakalp_sf_rules',
-            'mahakalp_sf_patterns',
-            'mahakalp_sf_decision_guides',
+            'kognyt_sf_constraints',
+            'kognyt_sf_doc_search',
+            'kognyt_sf_releases',
+            'kognyt_sf_rules',
+            'kognyt_sf_patterns',
+            'kognyt_sf_decision_guides',
           ])
-          .mockReturnValueOnce(['mahakalp_sf_constraints']),
+          .mockReturnValueOnce(['kognyt_sf_constraints']),
       } as unknown as YantraClient;
 
       const serverState = {
@@ -449,7 +449,7 @@ describe('integration', () => {
 
       await refreshEntitlement(mockClient, serverState, 600000);
       expect(serverState.toolDefs.length).toBe(1);
-      expect(serverState.toolDefs[0].name).toBe('mahakalp_sf_constraints');
+      expect(serverState.toolDefs[0].name).toBe('kognyt_sf_constraints');
     });
 
     it('preserves last known good entitlement on transient API failure', async () => {
@@ -461,28 +461,28 @@ describe('integration', () => {
           .mockResolvedValueOnce(createMockEntitlement({ status: 'active' })),
         getAllowedTools: vi.fn()
           .mockReturnValueOnce([
-            'mahakalp_sf_constraints',
-            'mahakalp_sf_doc_search',
-            'mahakalp_sf_releases',
-            'mahakalp_sf_rules',
-            'mahakalp_sf_patterns',
-            'mahakalp_sf_decision_guides',
+            'kognyt_sf_constraints',
+            'kognyt_sf_doc_search',
+            'kognyt_sf_releases',
+            'kognyt_sf_rules',
+            'kognyt_sf_patterns',
+            'kognyt_sf_decision_guides',
           ])
           .mockReturnValueOnce([
-            'mahakalp_sf_constraints',
-            'mahakalp_sf_doc_search',
-            'mahakalp_sf_releases',
-            'mahakalp_sf_rules',
-            'mahakalp_sf_patterns',
-            'mahakalp_sf_decision_guides',
+            'kognyt_sf_constraints',
+            'kognyt_sf_doc_search',
+            'kognyt_sf_releases',
+            'kognyt_sf_rules',
+            'kognyt_sf_patterns',
+            'kognyt_sf_decision_guides',
           ])
           .mockReturnValueOnce([
-            'mahakalp_sf_constraints',
-            'mahakalp_sf_doc_search',
-            'mahakalp_sf_releases',
-            'mahakalp_sf_rules',
-            'mahakalp_sf_patterns',
-            'mahakalp_sf_decision_guides',
+            'kognyt_sf_constraints',
+            'kognyt_sf_doc_search',
+            'kognyt_sf_releases',
+            'kognyt_sf_rules',
+            'kognyt_sf_patterns',
+            'kognyt_sf_decision_guides',
           ]),
       } as unknown as YantraClient;
 

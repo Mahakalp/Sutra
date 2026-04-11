@@ -46,9 +46,9 @@ The following tools are available without any authentication:
 
 | Tool | Description |
 |------|-------------|
-| `mahakalp_sf_constraints` | Governor limits, platform rules, and best practices |
-| `mahakalp_sf_doc_search` | Semantic search over Salesforce documentation |
-| `mahakalp_sf_releases` | Release metadata and dates |
+| `kognyt_sf_constraints` | Governor limits, platform rules, and best practices |
+| `kognyt_sf_doc_search` | Semantic search over Salesforce documentation |
+| `kognyt_sf_releases` | Release metadata and dates |
 
 Simply add the server to your AI tool's MCP configuration (see below).
 
@@ -74,9 +74,9 @@ claude mcp add salesforce-mcp -- npx -y @kognyt/salesforce-mcp --env KOGNYT_API_
 
 | Tool | Description |
 |------|-------------|
-| `mahakalp_sf_rules` | Best practice rules and coding standards |
-| `mahakalp_sf_patterns` | Reusable code patterns and templates |
-| `mahakalp_sf_decision_guides` | Architectural decision guides |
+| `kognyt_sf_rules` | Best practice rules and coding standards |
+| `kognyt_sf_patterns` | Reusable code patterns and templates |
+| `kognyt_sf_decision_guides` | Architectural decision guides |
 
 ### Custom Yantra URL (optional)
 

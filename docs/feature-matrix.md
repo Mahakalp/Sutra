@@ -17,17 +17,17 @@
 
 | Tool | Description | Yantra Sync Required |
 |------|-------------|---------------------|
-| `mahakalp_sf_constraints` | Governor limits, platform rules, best practices | No (bundled) |
-| `mahakalp_sf_doc_search` | Semantic search over Salesforce documentation | Yes |
-| `mahakalp_sf_releases` | Release metadata (API versions, dates, status) | No (bundled) |
+| `kognyt_sf_constraints` | Governor limits, platform rules, best practices | No (bundled) |
+| `kognyt_sf_doc_search` | Semantic search over Salesforce documentation | Yes |
+| `kognyt_sf_releases` | Release metadata (API versions, dates, status) | No (bundled) |
 
 ### Pro Tier Tools
 
 | Tool | Description | Yantra Sync Required |
 |------|-------------|---------------------|
-| `mahakalp_sf_rules` | Best practice rules and coding standards | Yes |
-| `mahakalp_sf_patterns` | Reusable code patterns and templates | Yes |
-| `mahakalp_sf_decision_guides` | Architectural decision guides and trade-off analysis | Yes |
+| `kognyt_sf_rules` | Best practice rules and coding standards | Yes |
+| `kognyt_sf_patterns` | Reusable code patterns and templates | Yes |
+| `kognyt_sf_decision_guides` | Architectural decision guides and trade-off analysis | Yes |
 
 ---
 
@@ -48,9 +48,9 @@
 
 | Scenario | Behavior | Available |
 |----------|----------|-----------|
-| Yantra API unreachable | Uses bundled data | `mahakalp_sf_constraints`, `mahakalp_sf_releases` |
-| Network failure | Uses bundled data | `mahakalp_sf_constraints`, `mahakalp_sf_releases` |
-| Startup with no network | Uses bundled data | `mahakalp_sf_constraints`, `mahakalp_sf_releases` |
+| Yantra API unreachable | Uses bundled data | `kognyt_sf_constraints`, `kognyt_sf_releases` |
+| Network failure | Uses bundled data | `kognyt_sf_constraints`, `kognyt_sf_releases` |
+| Startup with no network | Uses bundled data | `kognyt_sf_constraints`, `kognyt_sf_releases` |
 
 ### Pro Tier
 
@@ -65,17 +65,17 @@
 
 These tools work without any network connectivity:
 
-- `mahakalp_sf_constraints` — Governor limits and platform rules
-- `mahakalp_sf_releases` — Release metadata
+- `kognyt_sf_constraints` — Governor limits and platform rules
+- `kognyt_sf_releases` — Release metadata
 
 ### Network-Dependent Tools
 
 These require Yantra API connectivity:
 
-- `mahakalp_sf_doc_search` — Requires API for semantic search
-- `mahakalp_sf_rules` — Requires Pro entitlement
-- `mahakalp_sf_patterns` — Requires Pro entitlement
-- `mahakalp_sf_decision_guides` — Requires Pro entitlement
+- `kognyt_sf_doc_search` — Requires API for semantic search
+- `kognyt_sf_rules` — Requires Pro entitlement
+- `kognyt_sf_patterns` — Requires Pro entitlement
+- `kognyt_sf_decision_guides` — Requires Pro entitlement
 
 ---
 
@@ -88,7 +88,7 @@ These require Yantra API connectivity:
 | **Pro tool access** | Entitlement check | Falls back to free tier |
 | **Rate limiting** | Per-request limit validation | Unknown — defaults apply |
 | **Tool availability** | Tool list from `/api/auth/tier` | Uses cached tool list |
-| **Semantic search** (`mahakalp_sf_doc_search`) | Real-time API call | Returns error |
+| **Semantic search** (`kognyt_sf_doc_search`) | Real-time API call | Returns error |
 | **Rules/Patterns/Decision Guides** | Real-time API call | Returns error |
 
 ### What Does NOT Require Yantra

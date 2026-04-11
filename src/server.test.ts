@@ -9,15 +9,15 @@ function createMockClient(overrides: Partial<YantraClient> = {}): YantraClient {
     getEntitlement: vi.fn().mockResolvedValue(null),
     getAllowedTools: vi.fn((entitlement: Entitlement | null) => {
       if (!entitlement) {
-        return ['mahakalp_sf_constraints'];
+        return ['kognyt_sf_constraints'];
       }
       return [
-        'mahakalp_sf_constraints',
-        'mahakalp_sf_doc_search',
-        'mahakalp_sf_releases',
-        'mahakalp_sf_rules',
-        'mahakalp_sf_patterns',
-        'mahakalp_sf_decision_guides',
+        'kognyt_sf_constraints',
+        'kognyt_sf_doc_search',
+        'kognyt_sf_releases',
+        'kognyt_sf_rules',
+        'kognyt_sf_patterns',
+        'kognyt_sf_decision_guides',
       ];
     }),
     ...overrides,
@@ -27,7 +27,7 @@ function createMockClient(overrides: Partial<YantraClient> = {}): YantraClient {
 describe('server', () => {
   describe('getToolDefinitions', () => {
     it('returns tools for free tier', () => {
-      const tools = getToolDefinitions(['mahakalp_sf_constraints', 'mahakalp_sf_doc_search', 'mahakalp_sf_releases']);
+      const tools = getToolDefinitions(['kognyt_sf_constraints', 'kognyt_sf_doc_search', 'kognyt_sf_releases']);
       expect(tools).toHaveLength(3);
     });
 
@@ -43,8 +43,8 @@ describe('server', () => {
     });
 
     it('blocks pro tools for free tier', async () => {
-      const allowedTools = new Set(['mahakalp_sf_constraints']);
-      const result = await handleToolCall('mahakalp_sf_rules', { query: 'test' }, {} as unknown as YantraClient, allowedTools);
+      const allowedTools = new Set(['kognyt_sf_constraints']);
+      const result = await handleToolCall('kognyt_sf_rules', { query: 'test' }, {} as unknown as YantraClient, allowedTools);
       expect(result).toBeNull();
     });
 
@@ -52,21 +52,21 @@ describe('server', () => {
       const mockClient: YantraClient = {
         getConstraints: vi.fn().mockResolvedValue({ success: true, constraints: [], count: 0 }),
       } as unknown as YantraClient;
-      const allowedTools = new Set(['mahakalp_sf_constraints']);
-      const result = await handleToolCall('mahakalp_sf_constraints', { release_id: 'spring-26' }, mockClient, allowedTools);
+      const allowedTools = new Set(['kognyt_sf_constraints']);
+      const result = await handleToolCall('kognyt_sf_constraints', { release_id: 'spring-26' }, mockClient, allowedTools);
       expect(result).toBeDefined();
     });
 
     it('allows all tools for pro tier', async () => {
       const allowedTools = new Set([
-        'mahakalp_sf_constraints',
-        'mahakalp_sf_doc_search',
-        'mahakalp_sf_releases',
-        'mahakalp_sf_rules',
-        'mahakalp_sf_patterns',
-        'mahakalp_sf_decision_guides',
+        'kognyt_sf_constraints',
+        'kognyt_sf_doc_search',
+        'kognyt_sf_releases',
+        'kognyt_sf_rules',
+        'kognyt_sf_patterns',
+        'kognyt_sf_decision_guides',
       ]);
-      const result = await handleToolCall('mahakalp_sf_rules', { query: 'security' }, {} as unknown as YantraClient, allowedTools);
+      const result = await handleToolCall('kognyt_sf_rules', { query: 'security' }, {} as unknown as YantraClient, allowedTools);
       expect(result).not.toBeNull();
     });
   });
@@ -90,13 +90,13 @@ describe('server', () => {
         features: {},
       };
       const allowedTools = client.getAllowedTools(entitlement);
-      expect(allowedTools).toContain('mahakalp_sf_rules');
+      expect(allowedTools).toContain('kognyt_sf_rules');
     });
 
     it('client returns only free tools for null entitlement', async () => {
       const client = createMockClient();
       const allowedTools = client.getAllowedTools(null);
-      expect(allowedTools).not.toContain('mahakalp_sf_rules');
+      expect(allowedTools).not.toContain('kognyt_sf_rules');
     });
   });
 
@@ -122,8 +122,8 @@ describe('server', () => {
     });
 
     it('handleToolCall returns error for missing required params', async () => {
-      const allowedTools = new Set(['mahakalp_sf_doc_search']);
-      const result = await handleToolCall('mahakalp_sf_doc_search', {}, {} as unknown as YantraClient, allowedTools);
+      const allowedTools = new Set(['kognyt_sf_doc_search']);
+      const result = await handleToolCall('kognyt_sf_doc_search', {}, {} as unknown as YantraClient, allowedTools);
       expect(result?.isError).toBe(true);
     });
   });
@@ -228,8 +228,8 @@ describe('server', () => {
       
       vi.spyOn(mockClient, 'getEntitlement').mockRejectedValue(new Error('Network error'));
       vi.spyOn(mockClient, 'getAllowedTools').mockImplementation((entitlement) => {
-        if (!entitlement) return ['mahakalp_sf_constraints'];
-        return ['mahakalp_sf_constraints', 'mahakalp_sf_doc_search', 'mahakalp_sf_releases', 'mahakalp_sf_rules', 'mahakalp_sf_patterns', 'mahakalp_sf_decision_guides'];
+        if (!entitlement) return ['kognyt_sf_constraints'];
+        return ['kognyt_sf_constraints', 'kognyt_sf_doc_search', 'kognyt_sf_releases', 'kognyt_sf_rules', 'kognyt_sf_patterns', 'kognyt_sf_decision_guides'];
       });
 
       const serverState = {
@@ -244,7 +244,7 @@ describe('server', () => {
       
       await refreshEntitlement(mockClient, serverState, 600000);
       expect(serverState.entitlement).toBeNull();
-      expect(Array.from(serverState.allowedToolNames)).toContain('mahakalp_sf_constraints');
+      expect(Array.from(serverState.allowedToolNames)).toContain('kognyt_sf_constraints');
     });
 
     it('does not downgrade to free tier on API blip when entitlement was pro', async () => {
@@ -272,7 +272,7 @@ describe('server', () => {
       expect(serverState.entitlement?.tier).toBe('pro');
       
       const allowedTools = Array.from(serverState.allowedToolNames);
-      expect(allowedTools).toContain('mahakalp_sf_rules');
+      expect(allowedTools).toContain('kognyt_sf_rules');
     });
 
     it('correctly handles entitlement status change from active to past_due', async () => {
@@ -313,7 +313,7 @@ describe('server', () => {
       expect(serverState.entitlement?.status).toBe('past_due');
       
       const allowedTools = Array.from(serverState.allowedToolNames);
-      expect(allowedTools).not.toContain('mahakalp_sf_rules');
+      expect(allowedTools).not.toContain('kognyt_sf_rules');
     });
   });
 });

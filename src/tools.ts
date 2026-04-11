@@ -1,8 +1,8 @@
 /**
  * Sutra — MCP tool definitions and handlers
  *
- * Free tier:  sf_constraints, sf_doc_search, sf_releases
- * Pro tier:   + sf_rules, sf_patterns, sf_decision_guides
+ * Free tier:  kognyt_sf_constraints, kognyt_sf_doc_search, kognyt_sf_releases
+ * Pro tier:   + kognyt_sf_rules, kognyt_sf_patterns, kognyt_sf_decision_guides
  *
  * All tools call Yantra API endpoints. No direct database access.
  */
@@ -34,8 +34,8 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
   // Free tier
   // ---------------------------------------------------------------------------
 
-  mahakalp_sf_constraints: {
-    name: 'mahakalp_sf_constraints',
+  kognyt_sf_constraints: {
+    name: 'kognyt_sf_constraints',
     tier: 'free',
     description:
       'Get Salesforce platform constraints including governor limits, platform rules, and best practices. Returns structured data with limit values, context, workarounds, and code examples. Powered by Kognyt.',
@@ -70,8 +70,8 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
     },
   },
 
-  mahakalp_sf_doc_search: {
-    name: 'mahakalp_sf_doc_search',
+  kognyt_sf_doc_search: {
+    name: 'kognyt_sf_doc_search',
     tier: 'free',
     description:
       'Search Salesforce official documentation using semantic search. Returns relevant documentation chunks for RAG context. Useful for answering questions about Apex, LWC, SOQL, or any Salesforce platform feature. Powered by Kognyt.',
@@ -101,8 +101,8 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
     },
   },
 
-  mahakalp_sf_releases: {
-    name: 'mahakalp_sf_releases',
+  kognyt_sf_releases: {
+    name: 'kognyt_sf_releases',
     tier: 'free',
     description:
       'Get information about Salesforce releases. Returns release metadata including API version, status, and release dates. Powered by Kognyt.',
@@ -130,8 +130,8 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
   // Pro tier
   // ---------------------------------------------------------------------------
 
-  mahakalp_sf_rules: {
-    name: 'mahakalp_sf_rules',
+  kognyt_sf_rules: {
+    name: 'kognyt_sf_rules',
     tier: 'pro',
     description:
       'Query Salesforce best practice rules and coding standards. Returns rules with severity, category, and code examples. Use this to validate code against platform best practices. Requires Sutra Pro. Powered by Kognyt.',
@@ -164,8 +164,8 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
     },
   },
 
-  mahakalp_sf_patterns: {
-    name: 'mahakalp_sf_patterns',
+  kognyt_sf_patterns: {
+    name: 'kognyt_sf_patterns',
     tier: 'pro',
     description:
       'Search reusable Salesforce code patterns and implementation templates using semantic search. Returns patterns with code examples and context. Requires Sutra Pro. Powered by Kognyt.',
@@ -193,8 +193,8 @@ const ALL_TOOLS: Record<string, ToolDefinition> = {
     },
   },
 
-  mahakalp_sf_decision_guides: {
-    name: 'mahakalp_sf_decision_guides',
+  kognyt_sf_decision_guides: {
+    name: 'kognyt_sf_decision_guides',
     tier: 'pro',
     description:
       'Search Salesforce architectural decision guides — when to use X vs Y, trade-off analysis, and implementation recommendations. Requires Sutra Pro. Powered by Kognyt.',
@@ -277,18 +277,18 @@ export async function handleToolCall(
 
   switch (name) {
     // Free
-    case 'mahakalp_sf_constraints':
+    case 'kognyt_sf_constraints':
       return handleConstraints(args, client);
-    case 'mahakalp_sf_doc_search':
+    case 'kognyt_sf_doc_search':
       return handleDocSearch(args, client);
-    case 'mahakalp_sf_releases':
+    case 'kognyt_sf_releases':
       return handleReleases(args, client);
     // Pro
-    case 'mahakalp_sf_rules':
+    case 'kognyt_sf_rules':
       return handleRules(args, client);
-    case 'mahakalp_sf_patterns':
+    case 'kognyt_sf_patterns':
       return handlePatterns(args, client);
-    case 'mahakalp_sf_decision_guides':
+    case 'kognyt_sf_decision_guides':
       return handleDecisionGuides(args, client);
     default:
       return null;

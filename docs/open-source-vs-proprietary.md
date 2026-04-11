@@ -41,9 +41,9 @@ These tools are available without an API key and are included in the open-source
 
 | Tool | Description | API Endpoint |
 |------|-------------|--------------|
-| `mahakalp_sf_constraints` | Governor limits, platform rules, best practices | `/api/public/ecosystem/constraints` |
-| `mahakalp_sf_doc_search` | Semantic search over official Salesforce documentation | `/api/public/ecosystem/docs/search` |
-| `mahakalp_sf_releases` | Release metadata (API versions, dates, status) | `/api/public/ecosystem/releases` |
+| `kognyt_sf_constraints` | Governor limits, platform rules, best practices | `/api/public/ecosystem/constraints` |
+| `kognyt_sf_doc_search` | Semantic search over official Salesforce documentation | `/api/public/ecosystem/docs/search` |
+| `kognyt_sf_releases` | Release metadata (API versions, dates, status) | `/api/public/ecosystem/releases` |
 
 ### Free Tier Behavior
 
@@ -62,9 +62,9 @@ These tools require a valid `KOGNYT_API_KEY` and active subscription:
 
 | Tool | Description | API Endpoint |
 |------|-------------|--------------|
-| `mahakalp_sf_rules` | Best practice rules and coding standards with severity and code examples | `/api/public/ecosystem/rules/query` |
-| `mahakalp_sf_patterns` | Reusable code patterns and implementation templates | `/api/public/ecosystem/patterns/search` |
-| `mahakalp_sf_decision_guides` | Architectural decision guides and trade-off analysis | `/api/public/ecosystem/decision-guides/search` |
+| `kognyt_sf_rules` | Best practice rules and coding standards with severity and code examples | `/api/public/ecosystem/rules/query` |
+| `kognyt_sf_patterns` | Reusable code patterns and implementation templates | `/api/public/ecosystem/patterns/search` |
+| `kognyt_sf_decision_guides` | Architectural decision guides and trade-off analysis | `/api/public/ecosystem/decision-guides/search` |
 
 ### Content Packs
 

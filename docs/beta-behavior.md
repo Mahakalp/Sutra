@@ -26,9 +26,9 @@ These tools are available without registration or API key:
 
 | Tool | Description | Works Offline | Yantra API Required |
 |------|-------------|---------------|---------------------|
-| `mahakalp_sf_constraints` | Governor limits, platform rules, best practices with values, workarounds, and code examples | Yes (bundled) | No |
-| `mahakalp_sf_doc_search` | Semantic search over official Salesforce documentation | No | Yes |
-| `mahakalp_sf_releases` | Release metadata including API versions, status, and dates | Yes (bundled) | No |
+| `kognyt_sf_constraints` | Governor limits, platform rules, best practices with values, workarounds, and code examples | Yes (bundled) | No |
+| `kognyt_sf_doc_search` | Semantic search over official Salesforce documentation | No | Yes |
+| `kognyt_sf_releases` | Release metadata including API versions, status, and dates | Yes (bundled) | No |
 
 ### Pro Tier Tools
 
@@ -36,9 +36,9 @@ These tools require a valid `KOGNYT_API_KEY` and active subscription:
 
 | Tool | Description | Works Offline | Yantra API Required |
 |------|-------------|---------------|---------------------|
-| `mahakalp_sf_rules` | Best practice rules and coding standards with severity and code examples | No | Yes |
-| `mahakalp_sf_patterns` | Reusable code patterns and implementation templates | No | Yes |
-| `mahakalp_sf_decision_guides` | Architectural decision guides and trade-off analysis | No | Yes |
+| `kognyt_sf_rules` | Best practice rules and coding standards with severity and code examples | No | Yes |
+| `kognyt_sf_patterns` | Reusable code patterns and implementation templates | No | Yes |
+| `kognyt_sf_decision_guides` | Architectural decision guides and trade-off analysis | No | Yes |
 
 **Note**: Pro tools include all free tools.
 
@@ -63,7 +63,7 @@ All source code in the Sutra MCP server is open source:
 
 | Component | Description |
 |-----------|-------------|
-| **Pro Tier Tools** | `mahakalp_sf_rules`, `mahakalp_sf_patterns`, `mahakalp_sf_decision_guides` |
+| **Pro Tier Tools** | `kognyt_sf_rules`, `kognyt_sf_patterns`, `kognyt_sf_decision_guides` |
 | **Content Knowledge Base** | Rules database, pattern library, decision guides, tribal knowledge |
 | **Backend Services** | Yantra API, entitlement service, vector database, content management |
 | **Entitlement System** | Subscription verification, API key generation, rate limit enforcement |
@@ -142,17 +142,17 @@ When proprietary services are unavailable:
 
 These tools work without any network connectivity:
 
-- `mahakalp_sf_constraints` — Governor limits and platform rules
-- `mahakalp_sf_releases` — Release metadata
+- `kognyt_sf_constraints` — Governor limits and platform rules
+- `kognyt_sf_releases` — Release metadata
 
 ### Network-Dependent Tools
 
 These require Yantra API connectivity:
 
-- `mahakalp_sf_doc_search` — Requires API for semantic search
-- `mahakalp_sf_rules` — Requires Pro entitlement
-- `mahakalp_sf_patterns` — Requires Pro entitlement
-- `mahakalp_sf_decision_guides` — Requires Pro entitlement
+- `kognyt_sf_doc_search` — Requires API for semantic search
+- `kognyt_sf_rules` — Requires Pro entitlement
+- `kognyt_sf_patterns` — Requires Pro entitlement
+- `kognyt_sf_decision_guides` — Requires Pro entitlement
 
 ---
 

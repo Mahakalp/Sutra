@@ -259,12 +259,12 @@ class EntitlementManager {
 
 | Feature | Online | Offline |
 |---------|--------|---------|
-| `mahakalp_sf_constraints` | Latest from cache | Bundled v1 |
-| `mahakalp_sf_releases` | Latest from cache | Bundled v1 |
-| `mahakalp_sf_doc_search` | Live API | Error (graceful) |
-| `mahakalp_sf_rules` | Latest + API | Cached only |
-| `mahakalp_sf_patterns` | Latest + API | Cached only |
-| `mahakalp_sf_decision_guides` | Latest + API | Cached only |
+| `kognyt_sf_constraints` | Latest from cache | Bundled v1 |
+| `kognyt_sf_releases` | Latest from cache | Bundled v1 |
+| `kognyt_sf_doc_search` | Live API | Error (graceful) |
+| `kognyt_sf_rules` | Latest + API | Cached only |
+| `kognyt_sf_patterns` | Latest + API | Cached only |
+| `kognyt_sf_decision_guides` | Latest + API | Cached only |
 
 ### 7.3 Update Availability Detection
 

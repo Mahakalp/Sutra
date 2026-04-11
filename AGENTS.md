@@ -227,7 +227,7 @@ try {
 
 ```typescript
 switch (name) {
-  case 'mahakalp_sf_constraints':
+  case 'kognyt_sf_constraints':
     return handleConstraints(args, client);
   // ...
 }
