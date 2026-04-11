@@ -1,6 +1,6 @@
 # Sutra Open-Source vs Proprietary Boundaries
 
-This document defines what remains open source (MIT licensed) versus what is proprietary in the Sutra MCP server for the beta release.
+This document defines what remains open source (AGPL-3.0-only licensed) versus what is proprietary in the Sutra MCP server for the beta release.
 
 ---
 
@@ -21,7 +21,7 @@ This document defines what remains open source (MIT licensed) versus what is pro
 
 ### MCP Server (`src/` directory)
 
-All source code in the Sutra MCP server is open source under the MIT license:
+All source code in the Sutra MCP server is open source under the AGPL-3.0-only license:
 
 | File | Description |
 |------|-------------|
@@ -102,7 +102,7 @@ The subscription and access control system is proprietary:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                        OPEN SOURCE (MIT)                        │
+│                    OPEN SOURCE (AGPL-3.0-only)                  │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │   ┌─────────────┐      ┌─────────────┐      ┌─────────────┐   │

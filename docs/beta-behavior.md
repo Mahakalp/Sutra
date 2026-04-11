@@ -46,7 +46,7 @@ These tools require a valid `KOGNYT_API_KEY` and active subscription:
 
 ## 3. Open Source vs Proprietary Boundaries
 
-### Open Source (MIT License)
+### Open Source (AGPL-3.0-only License)
 
 All source code in the Sutra MCP server is open source:
 
