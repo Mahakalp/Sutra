@@ -113,7 +113,7 @@ Pro tools require an API key (free during beta):
 | `mahakalp_sf_patterns` | Reusable code patterns and implementation templates |
 | `mahakalp_sf_decision_guides` | Architectural decision guides and trade-off analysis |
 
-To enable Pro tools, set the `MAHAKALP_API_KEY` environment variable. See the [Setup Guide](./docs/setup.md) for details.
+To enable Pro tools, set the `KOGNYT_API_KEY` environment variable. See the [Setup Guide](./docs/setup.md) for details.
 
 ### Example usage
 

@@ -118,7 +118,7 @@ These require Yantra API connectivity:
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `MAHAKALP_API_KEY` | No | (none) | API key for Pro tier |
+| `KOGNYT_API_KEY` | No | (none) | API key for Pro tier |
 | `MAHAKALP_API_URL` | No | `https://yantra.kognyt.dev` | Yantra API base URL |
 | `MAHAKALP_TIMEOUT` | No | `10000` | Request timeout (ms) |
 

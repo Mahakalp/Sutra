@@ -497,7 +497,7 @@ describe('tools', () => {
     });
 
     it('rejects template literal injection', () => {
-      const errors = validateInput(schema, { query: '${process.env.MAHAKALP_API_KEY}' });
+      const errors = validateInput(schema, { query: '${process.env.KOGNYT_API_KEY}' });
       expect(errors).toHaveLength(0);
     });
 

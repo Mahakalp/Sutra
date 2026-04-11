@@ -196,7 +196,7 @@ These tools require a valid entitlement with status `active`, `trialing`, or `ca
 | Variable | Description | Default |
 |----------|-------------|---------|
 | `MAHAKALP_API_URL` | Yantra API base URL | `https://yantra.kognyt.dev` |
-| `MAHAKALP_API_KEY` | API key for Pro tier | (none) |
+| `KOGNYT_API_KEY` | API key for Pro tier | (none) |
 
 ### Refresh Intervals
 

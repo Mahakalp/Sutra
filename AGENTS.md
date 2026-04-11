@@ -252,7 +252,7 @@ Environment variables are handled in `src/index.ts`:
 ```typescript
 startServer({
   apiBaseUrl: process.env.MAHAKALP_API_URL,
-  apiKey: process.env.MAHAKALP_API_KEY,
+  apiKey: process.env.KOGNYT_API_KEY,
 });
 ```
 

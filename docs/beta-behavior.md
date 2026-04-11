@@ -32,7 +32,7 @@ These tools are available without registration or API key:
 
 ### Pro Tier Tools
 
-These tools require a valid `MAHAKALP_API_KEY` and active subscription:
+These tools require a valid `KOGNYT_API_KEY` and active subscription:
 
 | Tool | Description | Works Offline | Yantra API Required |
 |------|-------------|---------------|---------------------|
@@ -74,7 +74,7 @@ All source code in the Sutra MCP server is open source:
 
 ### Entitlement Flow
 
-1. Server starts and checks for `MAHAKALP_API_KEY`
+1. Server starts and checks for `KOGNYT_API_KEY`
 2. If no API key: tier is `free`, only free tools available
 3. If API key present: server calls `/api/auth/entitlement`
 4. On success: tier set to `pro` with status from entitlement
@@ -160,7 +160,7 @@ These require Yantra API connectivity:
 
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `MAHAKALP_API_KEY` | No | (none) | API key for Pro tier |
+| `KOGNYT_API_KEY` | No | (none) | API key for Pro tier |
 | `MAHAKALP_API_URL` | No | `https://yantra.kognyt.dev` | Yantra API base URL |
 | `MAHAKALP_TIMEOUT` | No | `10000` | Request timeout (ms) |
 

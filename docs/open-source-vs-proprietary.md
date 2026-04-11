@@ -58,7 +58,7 @@ These tools are available without an API key and are included in the open-source
 
 ### Pro Tier Tools
 
-These tools require a valid `MAHAKALP_API_KEY` and active subscription:
+These tools require a valid `KOGNYT_API_KEY` and active subscription:
 
 | Tool | Description | API Endpoint |
 |------|-------------|--------------|
@@ -173,7 +173,7 @@ The subscription and access control system is proprietary:
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `MAHAKALP_API_URL` | No | Custom Yantra API URL (default: `https://yantra.kognyt.dev`) |
-| `MAHAKALP_API_KEY` | No | API key for Pro tier access |
+| `KOGNYT_API_KEY` | No | API key for Pro tier access |
 | `MAHAKALP_TIMEOUT` | No | Request timeout in ms (default: 10000) |
 
 ---

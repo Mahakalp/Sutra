@@ -54,20 +54,20 @@ Simply add the server to your AI tool's MCP configuration (see below).
 
 ### Pro Tier (Beta - Free during beta)
 
-For access to Pro tools (currently free during beta), set the `MAHAKALP_API_KEY` environment variable:
+For access to Pro tools (currently free during beta), set the `KOGNYT_API_KEY` environment variable:
 
 ```bash
 # Linux/macOS
-export MAHAKALP_API_KEY="your-api-key"
+export KOGNYT_API_KEY="your-api-key"
 
 # Windows (PowerShell)
-$env:MAHAKALP_API_KEY="your-api-key"
+$env:KOGNYT_API_KEY="your-api-key"
 ```
 
 Or pass it directly in your MCP configuration:
 
 ```bash
-claude mcp add salesforce-mcp -- npx -y @kognyt/salesforce-mcp --env MAHAKALP_API_KEY=your-api-key
+claude mcp add salesforce-mcp -- npx -y @kognyt/salesforce-mcp --env KOGNYT_API_KEY=your-api-key
 ```
 
 **Pro tools include:**
@@ -97,7 +97,7 @@ claude mcp add salesforce-mcp -- npx -y @kognyt/salesforce-mcp
 For Pro tools:
 
 ```bash
-claude mcp add salesforce-mcp -- npx -y @kognyt/salesforce-mcp --env MAHAKALP_API_KEY=your-api-key
+claude mcp add salesforce-mcp -- npx -y @kognyt/salesforce-mcp --env KOGNYT_API_KEY=your-api-key
 ```
 
 ### Cursor
@@ -121,7 +121,7 @@ For Pro tools with API key, use a wrapper script:
 # Create a wrapper script
 cat > ~/sutra-mcp.sh << 'EOF'
 #!/bin/bash
-export MAHAKALP_API_KEY="your-api-key"
+export KOGNYT_API_KEY="your-api-key"
 exec npx -y @kognyt/salesforce-mcp "$@"
 EOF
 chmod +x ~/sutra-mcp.sh

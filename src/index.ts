@@ -11,7 +11,7 @@
  *
  * Environment variables:
  *   MAHAKALP_API_URL  — Yantra API base URL (default: https://yantra.kognyt.dev)
- *   MAHAKALP_API_KEY  — API key for paid tier tools (optional for free tools)
+ *   KOGNYT_API_KEY    — API key for paid tier tools (optional for free tools)
  */
 
 import { startServer } from './server.js';
@@ -27,7 +27,7 @@ console.debug = (...args: unknown[]) => write(args.map(String).join(' ') + '\n')
 // Start server
 startServer({
   apiBaseUrl: process.env.MAHAKALP_API_URL,
-  apiKey: process.env.MAHAKALP_API_KEY,
+  apiKey: process.env.KOGNYT_API_KEY,
 }).catch((error) => {
   process.stderr.write(`[sutra] Failed to start: ${error instanceof Error ? error.message : error}\n`);
   process.exit(1);
