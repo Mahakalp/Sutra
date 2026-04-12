@@ -204,4 +204,4 @@ The following are currently planned but not implemented. When added, they will b
 
 ## Version
 
-This document describes boundaries for **Sutra v0.3.0 (Beta)**.
+This document describes boundaries for **Sutra v0.3.1 (Beta)**.

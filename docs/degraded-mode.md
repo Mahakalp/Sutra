@@ -230,4 +230,4 @@ Check server logs for:
 
 ## Version
 
-This document describes behavior for Sutra v0.3.0.
+This document describes behavior for Sutra v0.3.1.

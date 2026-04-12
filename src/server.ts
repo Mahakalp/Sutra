@@ -52,7 +52,7 @@ export async function startServer(config: Partial<SutraConfig> = {}): Promise<vo
   await refreshEntitlement(client, serverState);
 
   const server = new Server(
-    { name: '@kognyt/salesforce-mcp', version: '0.3.0' },
+    { name: '@kognyt/salesforce-mcp', version: '0.3.1' },
     { capabilities: { tools: {} } }
   );
 

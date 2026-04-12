@@ -150,7 +150,7 @@ describe('integration', () => {
 
     it('server reports correct version', () => {
       const server = new Server(
-        { name: '@kognyt/salesforce-mcp', version: '0.3.0' },
+        { name: '@kognyt/salesforce-mcp', version: '0.3.1' },
         { capabilities: { tools: {} } }
       );
       expect(server).toBeDefined();
