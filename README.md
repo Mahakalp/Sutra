@@ -113,7 +113,7 @@ Pro tools require an API key (free during beta):
 | `kognyt_sf_patterns` | Reusable code patterns and implementation templates |
 | `kognyt_sf_decision_guides` | Architectural decision guides and trade-off analysis |
 
-To enable Pro tools, set the `KOGNYT_API_KEY` environment variable. See the [Setup Guide](./docs/setup.md) for details.
+To enable Pro tools, set the `KOGNYT_API_KEY` environment variable. See the [Setup Guide](https://github.com/Mahakalp/Sutra/blob/main/docs/setup.md) for details.
 
 ### Example usage
 
@@ -155,11 +155,11 @@ When entitlement sync fails:
 2. Falls back to free tier tools
 3. Retries entitlement refresh periodically
 
-This ensures the server continues working even during service disruptions. See [degraded-mode.md](./docs/degraded-mode.md) for detailed behavior.
+This ensures the server continues working even during service disruptions. See [degraded-mode.md](https://github.com/Mahakalp/Sutra/blob/main/docs/degraded-mode.md) for detailed behavior.
 
 ## Beta Behavior
 
-For the definitive source of truth on free vs Pro tier behavior, entitlements, and open-source boundaries, see [beta-behavior.md](./docs/beta-behavior.md).
+For the definitive source of truth on free vs Pro tier behavior, entitlements, and open-source boundaries, see [beta-behavior.md](https://github.com/Mahakalp/Sutra/blob/main/docs/beta-behavior.md).
 
 This document covers:
 - Free vs Pro tool availability
