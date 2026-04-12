@@ -1,6 +1,6 @@
 {
   "name": "@kognyt/salesforce-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Open-source MCP server that makes any AI assistant a Salesforce expert",
   "type": "module",
   "main": "dist/index.js",

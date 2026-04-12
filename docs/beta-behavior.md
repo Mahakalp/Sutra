@@ -235,6 +235,6 @@ The following are planned for future releases:
 
 ## Version
 
-This document describes behavior for **Sutra v0.2.0 (Beta)**.
+This document describes behavior for **Sutra v0.3.0 (Beta)**.
 
 Last updated: March 2026
