@@ -12,3 +12,4 @@ dist/
 # Beads volatile state
 .beads/backup/
 .beads/.sync.lock
+.beads/.beads-credential-key
